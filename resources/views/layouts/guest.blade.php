@@ -36,7 +36,7 @@
                             class="text-white font-medium hover:text-teal-300 transition-colors">Discover Jobs</a></li>
                     <li><a href="{{ url('/industries') }}"
                             class="text-white font-medium hover:text-teal-300 transition-colors">Jobs by Industry</a></li>
-                    <li><a href="{{ url('/contact') }}"
+                    <li><a href="{{ route('contact us') }}"
                             class="text-white font-medium hover:text-teal-300 transition-colors">Contact Us</a></li>
                 </ul>
 

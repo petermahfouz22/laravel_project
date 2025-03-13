@@ -21,7 +21,7 @@
                         <li><a href="{{ route('about') }}" class="text-white font-medium hover:underline">About</a></li>
                         <li><a href="{{ route('job_search') }}" class="text-white font-medium hover:underline">Discover Jobs</a></li>
                         <li><a href="#" class="text-white font-medium hover:underline">Jobs by Industry</a></li>
-                        <li><a href="#" class="text-white font-medium hover:underline">Contact Us</a></li>
+                        <li><a href="{{ route('contact us') }}" class="text-white font-medium hover:underline">Contact Us</a></li>
                     </ul>
 
                     <div class="hidden md:flex space-x-4">

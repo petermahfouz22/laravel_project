@@ -34,6 +34,13 @@ Route::get('/job', function () {
 Route::get('/about', function () {
     return view('about');
 })->name('about');
+Route::get('/jobShow', function () {
+    return view('jobs.show');
+})->name('jobs.show');
+Route::get('/contact_us', function () {
+    return view('contact us');
+})->name('contact us');
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');
