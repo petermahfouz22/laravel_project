@@ -34,7 +34,7 @@
                             class="text-white font-medium hover:text-teal-300 transition-colors">About</a></li>
                     <li><a href="{{ route('job_search') }}"
                             class="text-white font-medium hover:text-teal-300 transition-colors">Discover Jobs</a></li>
-                    <li><a href="{{ url('/industries') }}"
+                    <li><a href="{{ route('job_category') }}"
                             class="text-white font-medium hover:text-teal-300 transition-colors">Jobs by Industry</a></li>
                     <li><a href="{{ route('contact us') }}"
                             class="text-white font-medium hover:text-teal-300 transition-colors">Contact Us</a></li>
@@ -71,9 +71,9 @@
                 <a href="{{ route('about') }}" class="text-white font-medium hover:text-teal-300 transition-colors">About</a>
                 <a href="{{ route('job_search') }}" class="text-white font-medium hover:text-teal-300 transition-colors">Discover
                     Jobs</a>
-                <a href="{{ url('/industries') }}" class="text-white font-medium hover:text-teal-300 transition-colors">Jobs
+                <a href="{{ route('job_category') }}" class="text-white font-medium hover:text-teal-300 transition-colors">Jobs
                     by Industry</a>
-                <a href="{{ url('/contact') }}" class="text-white font-medium hover:text-teal-300 transition-colors">Contact
+                <a href="{{ route('contact us') }}" class="text-white font-medium hover:text-teal-300 transition-colors">Contact
                     Us</a>
                 @auth
                     <a href="{{ url('/dashboard') }}"
