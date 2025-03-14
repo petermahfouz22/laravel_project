@@ -30,10 +30,14 @@ Route::get('/job_category', function () {
     return view('job_category');
 })->name('job_category');
 
+Route::get('/admin', function () {
+    return view('admin.dashboard');
+})->name('admin.dashboard');
+
 
 //!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 //!Github
-Route::get('/auth/redirect', function () {
+Route::get('/auth/github/redirect', function () {
     return Socialite::driver('github')->redirect();
 });
 
@@ -42,12 +46,22 @@ Route::get('/auth/callback', function () {
 });
 
 //!Google
-Route::get('/auth/redirect', function () {
+Route::get('/auth/google/redirect', function () {
     return Socialite::driver('google')->redirect();
 });
 
 Route::get('/auth/callback', function () {
     $user = Socialite::driver('google')->user();
+});
+//!Facebook
+Route::get('/auth/facebook/redirect', function () {
+    return Socialite::driver('facebook')->redirect();
+})->name('facebook.redirect');
+
+Route::get('/auth/facebook/callback', function () {
+    $user = Socialite::driver('facebook')->user();
+    // Handle the authenticated user (e.g., log them in)
+    return redirect('/dashboard');
 });
 //!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 Route::get('/dashboard', function () {
