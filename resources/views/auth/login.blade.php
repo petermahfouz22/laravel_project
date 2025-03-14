@@ -42,6 +42,14 @@
             <x-primary-button class="ms-3">
                 {{ __('Log in') }}
             </x-primary-button>
+
+            <a class="ms-3" href="/auth/redirect">
+              {{ __('Log in with Github') }}
+            </a>
+
+            <a class="ms-3" href="/auth/google/redirect">
+              {{ __('Log in with Google') }}
+            </a>
         </div>
     </form>
 </x-guest-layout>
