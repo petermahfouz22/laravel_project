@@ -110,6 +110,10 @@
         <!-- Signup Dropdown -->
         <div class="dropdown">
           <a href="#" class="dropbtn btn btn-outline-primary btn-sm">Signup</a>
+          <div class="dropdown-content">
+            <a href="#">Candidate</a>
+            <a href="#">Employer</a>
+          </div>
         </div>
 
         <!-- Login Dropdown -->
