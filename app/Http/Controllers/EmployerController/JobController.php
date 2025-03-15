@@ -6,6 +6,7 @@ use App\Models\Job;
 use App\Models\JobCategory;
 use App\Models\Technology;
 use App\Models\Application;
+use App\Http\Requests\JobRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -97,7 +98,7 @@ class JobController extends Controller
      * Store a newly created job in storage.
      * Employer only access.
      */
-    public function store(Request $request)
+    public function store(JobRequest $request)
     {
         // Verify employer access
         if (!auth()->user()->isEmployer()) {
@@ -111,21 +112,7 @@ class JobController extends Controller
                 ->with('info', 'You need to create a company profile before posting jobs.');
         }
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'category_id' => 'required|exists:job_categories,id',
-            'description' => 'required|string',
-            'responsibilities' => 'required|string',
-            'requirements' => 'required|string',
-            'benefits' => 'nullable|string',
-            'location' => 'required|string|max:255',
-            'work_type' => 'required|in:remote,onsite,hybrid',
-            'salary_min' => 'nullable|numeric|min:0',
-            'salary_max' => 'nullable|numeric|min:0|gte:salary_min',
-            'application_deadline' => 'required|date|after:today',
-            'technologies' => 'nullable|array',
-            'technologies.*' => 'exists:technologies,id',
-        ]);
+        $validated = $request->validated();
 
         // Create slug from title
         $slug = Str::slug($validated['title']);
@@ -234,7 +221,7 @@ class JobController extends Controller
      * Update the specified job in storage.
      * Only job employer or admin can update.
      */
-    public function update(Request $request, string $id)
+    public function update(JobRequest $request, string $id)
     {
         $job = Job::findOrFail($id);
 
@@ -244,22 +231,7 @@ class JobController extends Controller
                 ->with('error', 'You don\'t have permission to update this job.');
         }
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'category_id' => 'required|exists:job_categories,id',
-            'description' => 'required|string',
-            'responsibilities' => 'required|string',
-            'requirements' => 'required|string',
-            'benefits' => 'nullable|string',
-            'location' => 'required|string|max:255',
-            'work_type' => 'required|in:remote,onsite,hybrid',
-            'salary_min' => 'nullable|numeric|min:0',
-            'salary_max' => 'nullable|numeric|min:0|gte:salary_min',
-            'application_deadline' => 'required|date',
-            'is_active' => 'boolean',
-            'technologies' => 'nullable|array',
-            'technologies.*' => 'exists:technologies,id',
-        ]);
+        $validated = $request->validated();
 
         // Update job details
         $job->title = $validated['title'];
@@ -295,8 +267,8 @@ class JobController extends Controller
         }
         
         // Only admin can approve jobs
-        if (auth()->user()->isAdmin() && $request->has('is_approved')) {
-            $job->is_approved = $request->boolean('is_approved');
+        if (auth()->user()->isAdmin() && isset($validated['is_approved'])) {
+            $job->is_approved = $validated['is_approved'];
         }
         
         $job->save();

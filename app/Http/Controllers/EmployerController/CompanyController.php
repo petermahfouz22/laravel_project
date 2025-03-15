@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use App\Http\Requests\CompanyRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,7 +17,7 @@ class CompanyController extends Controller
     {
         // Verify admin access
         if (!auth()->user()->isAdmin()) {
-            return redirect()->route('dashboard')->with('error', 'no permission');
+            return redirect()->route('dashboard')->with('error', 'You do not have permission to access this page.');
         }
 
         $companies = Company::with('user')->latest()->paginate(10);
@@ -37,7 +38,7 @@ class CompanyController extends Controller
         // Check if employer already has a company
         if (auth()->user()->company) {
             return redirect()->route('companies.edit', auth()->user()->company)
-                ->with('info', '');
+                ->with('info', 'You already have a company. You can edit its details here.');
         }
 
         return view('companies.create');
@@ -47,29 +48,9 @@ class CompanyController extends Controller
      * Store a newly created company in storage.
      * Employer only access.
      */
-    public function store(Request $request)
+    public function store(CompanyRequest $request)
     {
-        // Verify employer access
-        if (!auth()->user()->isEmployer()) {
-            return redirect()->route('dashboard')->with('error', 'يجب أن تكون صاحب عمل لإنشاء شركة.');
-        }
-
-        // Check if employer already has a company
-        if (auth()->user()->company) {
-            return redirect()->route('companies.edit', auth()->user()->company)
-                ->with('info', 'لديك شركة بالفعل. يمكنك تعديل بياناتها هنا.');
-        }
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'logo' => 'nullable|image|max:2048', // max 2MB
-            'website' => 'nullable|url|max:255',
-            'location' => 'required|string|max:255',
-            'industry' => 'required|string|max:255',
-            'size' => 'nullable|string|max:50',
-            'founded_year' => 'nullable|integer|min:1800|max:' . date('Y'),
-        ]);
+        $validated = $request->validated();
 
         // Handle logo upload
         if ($request->hasFile('logo')) {
@@ -83,7 +64,7 @@ class CompanyController extends Controller
         $company = Company::create($validated);
 
         return redirect()->route('companies.show', $company)
-            ->with('success', 'تم إنشاء الشركة بنجاح.');
+            ->with('success', 'Company created successfully.');
     }
 
     /**
@@ -109,7 +90,7 @@ class CompanyController extends Controller
     {
         // Verify access (company owner or admin)
         if (auth()->id() !== $company->user_id && !auth()->user()->isAdmin()) {
-            return redirect()->route('dashboard')->with('error', 'غير مصرح بالوصول.');
+            return redirect()->route('dashboard')->with('error', 'Unauthorized access.');
         }
 
         return view('companies.edit', compact('company'));
@@ -119,23 +100,9 @@ class CompanyController extends Controller
      * Update the specified company in storage.
      * Only company owner or admin can update.
      */
-    public function update(Request $request, Company $company)
+    public function update(CompanyRequest $request, Company $company)
     {
-        // Verify access (company owner or admin)
-        if (auth()->id() !== $company->user_id && !auth()->user()->isAdmin()) {
-            return redirect()->route('dashboard')->with('error', 'غير مصرح بالوصول.');
-        }
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'logo' => 'nullable|image|max:2048', // max 2MB
-            'website' => 'nullable|url|max:255',
-            'location' => 'required|string|max:255',
-            'industry' => 'required|string|max:255',
-            'size' => 'nullable|string|max:50',
-            'founded_year' => 'nullable|integer|min:1800|max:' . date('Y'),
-        ]);
+        $validated = $request->validated();
 
         // Handle logo upload
         if ($request->hasFile('logo')) {
@@ -151,7 +118,7 @@ class CompanyController extends Controller
         $company->update($validated);
 
         return redirect()->route('companies.show', $company)
-            ->with('success', 'تم تحديث بيانات الشركة بنجاح.');
+            ->with('success', 'Company details updated successfully.');
     }
 
     /**
@@ -162,7 +129,7 @@ class CompanyController extends Controller
     {
         // Verify access (company owner or admin)
         if (auth()->id() !== $company->user_id && !auth()->user()->isAdmin()) {
-            return redirect()->route('dashboard')->with('error', 'غير مصرح بالوصول.');
+            return redirect()->route('dashboard')->with('error', 'Unauthorized access.');
         }
 
         // Delete company logo if exists
@@ -173,7 +140,7 @@ class CompanyController extends Controller
         $company->delete();
 
         return redirect()->route('dashboard')
-            ->with('success', 'تم حذف الشركة بنجاح.');
+            ->with('success', 'Company deleted successfully.');
     }
     
     /**
@@ -184,7 +151,7 @@ class CompanyController extends Controller
     {
         // Verify access (company owner or admin)
         if (auth()->id() !== $company->user_id && !auth()->user()->isAdmin()) {
-            return redirect()->route('dashboard')->with('error', 'غير مصرح بالوصول.');
+            return redirect()->route('dashboard')->with('error', 'Unauthorized access.');
         }
 
         // Delete logo if exists
@@ -194,6 +161,6 @@ class CompanyController extends Controller
         }
 
         return redirect()->route('companies.edit', $company)
-            ->with('success', 'تم حذف شعار الشركة بنجاح.');
+            ->with('success', 'Company logo removed successfully.');
     }
 }
