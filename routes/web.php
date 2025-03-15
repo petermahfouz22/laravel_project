@@ -3,10 +3,16 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 
 Route::get('/', function () {
     return view('welcome');
+});
+//testing routes
+
+Route::get('/candidate/profile', function(){
+    return view('candidate.profile');
 });
 
 Route::get('/dashboard', function () {
