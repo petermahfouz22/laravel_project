@@ -13,16 +13,56 @@ class UserController extends Controller
      * Display a listing of the users.
      * Admin access only.
      */
+    // public function index()
+    // {
+    //     // Verify admin access
+    //     if (!auth()->user()->isAdmin()) {
+    //         return redirect()->route('dashboard')->with('error', 'No permission ');
+    //     }
+
+    //     $users = User::latest()->paginate(10);
+    //     return view('admin.users.index', compact('users'));
+    // }
+    // public function edit(User $user)
+    // {
+    //     // Verify access (admin or own profile)
+    //     if (!auth()->user()->isAdmin() && auth()->id() !== $user->id) {
+    //         return redirect()->route('dashboard')->with('error', 'No Permission');
+    //     }
+    
+    //     return view('users.edit', compact('user'));
+    // }
+
     public function index()
     {
-        // Verify admin access
-        if (!auth()->user()->isAdmin()) {
-            return redirect()->route('dashboard')->with('error', 'No permission ');
-        }
-
-        $users = User::latest()->paginate(10);
-        return view('admin.users.index', compact('users'));
+        $users = User::paginate(10);
+        $candidates = User::where('role', 'candidate')->paginate(10); // Fetch only candidates
+        $employers = User::where('role', 'employer')->paginate(10); // Fetch only employers
+        $admins = User::where('role', 'admin')->paginate(10);
+        return view('admin.users.index',  compact('users', 'candidates','employers','admins'));
     }
+    public function update(Request $request, $id)
+{
+    $user = User::findOrFail($id);
+
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . $id,
+        'password' => 'nullable|min:8|confirmed',
+    ]);
+
+    $user->name = $request->name;
+    $user->email = $request->email;
+
+    if ($request->filled('password')) {
+        $user->password = Hash::make($request->password);
+    }
+
+    $user->save();
+
+    return redirect()->route('admin.users')->with('success', 'User updated successfully.');
+}
+
 
     /**
      * Show the form for creating a new user.
@@ -82,60 +122,27 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified user.
      */
-    public function edit(User $user)
-    {
-        // Verify access (admin or own profile)
-        if (!auth()->user()->isAdmin() && auth()->id() !== $user->id) {
-            return redirect()->route('dashboard')->with('error', 'No Permission');
-        }
-
-        return view('users.edit', compact('user'));
-    }
 
     /**
      * Update the specified user in storage.
      */
-    public function update(Request $request, User $user)
+    public function edit(Request $request, $id)
     {
-        // Verify access (admin or own profile)
-        if (!auth()->user()->isAdmin() && auth()->id() !== $user->id) {
-            return redirect()->route('dashboard')->with('error', 'No Permission');
-        }
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => [
-                'required', 
-                'string', 
-                'email', 
-                'max:255', 
-                Rule::unique('users')->ignore($user->id),
-            ],
-            'password' => 'nullable|string|min:8|confirmed',
+        $user = User::findOrFail($id);
+    
+        // $request->validate([
+        //     'name' => 'required|string|max:255',
+        //     'email' => 'required|email|unique:users,email,' . $id,
+        // ]);
+    
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
         ]);
-
-        // Only admin can change roles
-        if (auth()->user()->isAdmin() && $request->has('role')) {
-            $validated['role'] = $request->validate([
-                'role' => 'required|in:admin,employer,candidate',
-            ])['role'];
-        }
-
-        $user->name = $validated['name'];
-        $user->email = $validated['email'];
-        
-        if (isset($validated['password'])) {
-            $user->password = Hash::make($validated['password']);
-        }
-        
-        if (isset($validated['role'])) {
-            $user->role = $validated['role'];
-        }
-        
-        $user->save();
-
-        return redirect()->route('users.show', $user)->with('success', 'Update the user successfully');
+    
+        return redirect()->route('admin.users.editUser')->with('success', 'User updated successfully.');
     }
+    
 
     /**
      * Remove the specified user from storage.
@@ -158,7 +165,7 @@ class UserController extends Controller
     public function dashboard()
     {
         $user = auth()->user();
-        
+
         // Redirect to appropriate dashboard based on user role
         if ($user->isAdmin()) {
             return $this->adminDashboard();
@@ -179,7 +186,7 @@ class UserController extends Controller
         $totalJobs = \App\Models\Job::count();
         $pendingJobs = \App\Models\Job::where('is_approved', false)->count();
         $pendingComments = \App\Models\Comment::where('is_approved', false)->count();
-        
+
         return view('admin.dashboard', compact('totalUsers', 'totalJobs', 'pendingJobs', 'pendingComments'));
     }
 
@@ -191,7 +198,7 @@ class UserController extends Controller
         $user = auth()->user();
         $jobs = $user->postedJobs()->latest()->paginate(5);
         $totalApplications = \App\Models\Application::whereIn('job_id', $user->postedJobs()->pluck('id'))->count();
-        
+
         return view('employer.dashboard', compact('jobs', 'totalApplications'));
     }
 
@@ -203,7 +210,7 @@ class UserController extends Controller
         $user = auth()->user();
         $applications = $user->applications()->with('job')->latest()->paginate(5);
         $savedJobs = $user->savedJobs ?? collect();
-        
+
         return view('candidate.dashboard', compact('applications', 'savedJobs'));
     }
 }

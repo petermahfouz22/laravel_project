@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -33,6 +34,19 @@ Route::get('/job_category', function () {
 Route::get('/admin', function () {
     return view('admin.dashboard');
 })->name('admin.dashboard');
+Route::get('/users',[UserController::class,'index'])->name('admin.users.index');
+
+Route::get('/users/show', function () {
+    return view('admin.users.show');
+})->name('admin.users.show');
+
+Route::get('/addAdmin', function () {
+    return view('admin.addAdmin');
+})->name('addAdmin');
+
+Route::get('/admin/users/{id}/editUser', [UserController::class, 'edit'])->name('editUser');
+
+
 
 
 //!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
