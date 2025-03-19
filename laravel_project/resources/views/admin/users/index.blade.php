@@ -4,7 +4,7 @@
   <div class="container mx-auto mt-5">
     <div class="bg-white shadow rounded-lg">
     <!-- Header -->
-    <div class="bg-blue-600 text-white px-6 py-4 rounded-t-lg">
+    <div class="bg-gray-900 text-white px-6 py-4 rounded-t-lg">
       <h3 class="text-lg font-semibold">Manage Users</h3>
     </div>
 
@@ -47,8 +47,8 @@
         <td class="px-4 py-2 text-center">{{ $user->email }}</td>
         <td class="px-4 py-2 text-center">{{ $user->role }}</td>
         <td class="px-4 py-2 text-center">
-        <a href=""
-          class="text-white mr-2 bg-blue-600 hover:bg-blue-700 font-medium rounded-lg px-4 py-2 transition shadow-md inline-block">
+        <a href="{{ route('admin.users.show', $user->id) }}"
+          class="text-white mr-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">
           <i class="fas fa-eye"></i> View
         </a>
         <a href="{{ route('editUser', $user->id) }}"
@@ -57,7 +57,7 @@
         </a>
 
 
-        <form action="" method="POST" class="inline">
+        <form action="{{ route('deleteUser', $user->id)}}" method="POST" class="inline">
           @csrf
           @method('DELETE')
           <button type="submit" onclick="return confirm('Are you sure you want to delete this user?');"
@@ -101,7 +101,7 @@
           class="text-white mr-2 bg-blue-600 hover:bg-blue-700 font-medium rounded-lg px-4 py-2 transition shadow-md inline-block">
           <i class="fas fa-eye"></i> View
         </a>
-        <a href="#"
+        <a href="{{ route('editUser', $user->id) }}"
           class="text-white mr-2 bg-green-600 hover:bg-green-700 font-medium rounded-lg px-4 py-2 transition shadow-md inline-block">
           <i class="fas fa-edit"></i> Edit
         </a>
@@ -145,7 +145,7 @@
           class="text-white mr-2 bg-blue-600 hover:bg-blue-700 font-medium rounded-lg px-4 py-2 transition shadow-md inline-block">
           <i class="fas fa-eye"></i> View
         </a>
-        <a href=""
+        <a href="{{ route('editUser', $user->id) }}"
           class="text-white mr-2 bg-green-600 hover:bg-green-700 font-medium rounded-lg px-4 py-2 transition shadow-md inline-block">
           <i class="fas fa-edit"></i> Edit
         </a>

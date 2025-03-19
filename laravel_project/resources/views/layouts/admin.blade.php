@@ -43,7 +43,7 @@
 
                 <!-- Right Navigation -->
                 <div class="flex items-center">
-                    <a href="/admin/add"
+                    <a href="{{ route('addAdmin') }}"
                     class="border-2 border-teal-500 text-teal-500 px-6 py-2 rounded-full font-medium hover:bg-teal-500 hover:text-white transition-colors">
                         <i class="fas fa-plus"></i>
                         <span>Add Admin</span>
