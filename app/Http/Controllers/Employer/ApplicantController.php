@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Employer;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\Job;
+use App\Models\Interview;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -38,7 +39,10 @@ class ApplicantController extends Controller
             ->with(['candidate', 'candidate.profile'])
             ->findOrFail($applicationId);
             
-        return view('employer.applications.show', compact('job', 'application'));
+        // Add this line to get the interviews
+        $interviews = Interview::where('application_id', $applicationId)->get();
+            
+        return view('employer.applications.show', compact('job', 'application', 'interviews'));
     }
     
     /**

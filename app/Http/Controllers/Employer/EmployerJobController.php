@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Employer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Job;
+use App\Models\Application;
 use App\Models\Company;
 use App\Models\JobCategory;
 use App\Models\Technology;
@@ -18,8 +19,7 @@ class EmployerJobController extends Controller
     public function index()
     {
         $jobs = Job::where('employer_id', auth()->id())
-            ->with(['company', 'category'])
-            ->latest()
+            ->with(['company', 'category', 'technologies', 'applications.candidate'])
             ->paginate(10);
             
         return view('employer.jobs.index', compact('jobs'));

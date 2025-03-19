@@ -12,31 +12,27 @@ use Illuminate\Support\Facades\Route;
 // Public routes
 Route::get('/', function () {
     return view('welcome');
-})-> name('welcome');
+})->name('welcome');
 
 Route::get('/job', function () {
-  return view('job_search');
+    return view('job_search');
 })->name('job_search');
 
 Route::get('/about', function () {
-  return view('about');
+    return view('about');
 })->name('about');
 
-Route::get('/jobShow', function () {
-  return view('jobs.show');
-})->name('jobs.show');
-
 Route::get('/job_category', function () {
-  return view('job_category');
+    return view('job_category');
 })->name('job_category');
 
 Route::get('/contact_us', function () {
-  return view('contact us');
-})->name('contact us');
+    return view('contact_us');
+})->name('contact_us');
 
 Route::get('/jobs/show', function () {
-  return view('jobs.show');
-});
+    return view('jobs.show');
+})->name('jobs.show');
 
 // Authentication routes
 Route::get('/dashboard', function () {
@@ -51,33 +47,37 @@ Route::middleware('auth')->group(function () {
 
 // Social authentication routes
 Route::get('/auth/redirect', function () {
-  return Socialite::driver('github')->redirect();
+    return Socialite::driver('github')->redirect();
 });
 
 Route::get('/auth/callback', function () {
-  $user = Socialite::driver('github')->user();
-  // $user->token
+    $user = Socialite::driver('github')->user();
+    // $user->token
 });
 
 Route::get('/auth/google/redirect', function () {
-  return Socialite::driver('google')->redirect();
+    return Socialite::driver('google')->redirect();
 });
 
 Route::get('/auth/google/callback', function () {
-  $user = Socialite::driver('google')->user();
-  // $user->token
+    $user = Socialite::driver('google')->user();
+    // $user->token
 });
 
 // Employer routes
 Route::middleware(['auth', \App\Http\Middleware\EmployerMiddleware::class])->prefix('employer')->name('employer.')->group(function () {
-  Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Profile
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    
+    // Company Profile Routes
+    Route::resource('companies', CompanyProfileController::class);
+    
     // Job management
     Route::resource('jobs', EmployerJobController::class);
     Route::put('/jobs/{job}/toggle-active', [EmployerJobController::class, 'toggleActive'])->name('jobs.toggle-active');
-    
-    // Company profiles
-    Route::resource('companies', CompanyProfileController::class);
     
     // Application management
     Route::get('/jobs/{job}/applications', [ApplicantController::class, 'index'])->name('applications.index');
