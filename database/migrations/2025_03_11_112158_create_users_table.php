@@ -19,7 +19,7 @@ return new class extends Migration
         $table->string('password');
         // Role determines permissions and accessible features
         $table->enum('role', ['admin', 'employer', 'candidate'])
-              ->comment('Admin: platform management, Employer: posts jobs, Candidate: applies to jobs');
+            ->comment('Admin: platform management, Employer: posts jobs, Candidate: applies to jobs');
         $table->rememberToken();
         $table->timestamps();
         

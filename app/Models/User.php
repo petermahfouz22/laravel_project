@@ -21,8 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
-    ];
+        'role_id',  // Changed from 'role'
+      ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -115,4 +115,11 @@ class User extends Authenticatable
     {
         return $this->role === 'candidate';
     }
+
+  /**
+ * Check if user has the specified role.
+ */
+
+
+
 }
