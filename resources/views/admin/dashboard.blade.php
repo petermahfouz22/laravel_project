@@ -130,7 +130,7 @@
       <div class="flex justify-between items-center">
         <div>
         <p class="text-xs font-bold text-green-600 uppercase tracking-wider">Total Employers</p>
-        <p class="text-2xl font-bold text-gray-800 mt-1">15</p>
+        <p class="text-2xl font-bold text-gray-800 mt-1">{{ $employerCount }}</p>
         </div>
         <div class="p-3 bg-green-100 rounded-full">
         <i class="fas fa-building text-green-500 text-xl"></i>

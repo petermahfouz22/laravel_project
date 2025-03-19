@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -36,15 +36,15 @@ Route::get('/admin', function () {
 })->name('admin.dashboard');
 Route::get('/users',[UserController::class,'index'])->name('admin.users.index');
 
-Route::get('/users/show', function () {
-    return view('admin.users.show');
-})->name('admin.users.show');
+Route::get('/users/show/{id}', [UserController::class, 'show'])->name('admin.users.show');
+Route::get('/admin/users/{id}/editUser', [UserController::class, 'editUser'])->name('editUser');
+Route::put('/admin/users/{id}/update', [UserController::class, 'updateUser'])->name('updateUser');
+Route::delete('/admin/users/{id}', [UserController::class, 'deleteUser'])->name('deleteUser');
 
-Route::get('/addAdmin', function () {
+Route::get('/admin/addAdmin', function () {
     return view('admin.addAdmin');
 })->name('addAdmin');
 
-Route::get('/admin/users/{id}/editUser', [UserController::class, 'edit'])->name('editUser');
 
 
 

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
+use App\Http\Controllers\Controller; // Add this line
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -29,7 +30,7 @@ class UserController extends Controller
     //     if (!auth()->user()->isAdmin() && auth()->id() !== $user->id) {
     //         return redirect()->route('dashboard')->with('error', 'No Permission');
     //     }
-    
+
     //     return view('users.edit', compact('user'));
     // }
 
@@ -37,32 +38,45 @@ class UserController extends Controller
     {
         $users = User::paginate(10);
         $candidates = User::where('role', 'candidate')->paginate(10); // Fetch only candidates
+        
         $employers = User::where('role', 'employer')->paginate(10); // Fetch only employers
         $admins = User::where('role', 'admin')->paginate(10);
-        return view('admin.users.index',  compact('users', 'candidates','employers','admins'));
-    }
-    public function update(Request $request, $id)
-{
-    $user = User::findOrFail($id);
-
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email,' . $id,
-        'password' => 'nullable|min:8|confirmed',
-    ]);
-
-    $user->name = $request->name;
-    $user->email = $request->email;
-
-    if ($request->filled('password')) {
-        $user->password = Hash::make($request->password);
+        return view('admin.users.index', compact('users', 'candidates', 'employers', 'admins'));
     }
 
-    $user->save();
+    public function show($id)
+    {
+        // Verify access (admin or own profile)
+        // if (!auth()->user()->isAdmin() && auth()->id() !== $user->id) {
+        //     return redirect()->route('dashboard')->with('error', 'No permission');
+        // }
+        $user = User::find($id);
+        return view('admin.users.show', compact('user'));
+    }
+    public function editUser($id)
+    {
+        $user = User::findOrFail($id);
+        return view('admin.users.editUser', compact('user'));
+    }
 
-    return redirect()->route('admin.users')->with('success', 'User updated successfully.');
-}
-
+    //!>>>>>>>>>>>>>>>>>>>>>>>>>>>Update User>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    public function updateUser(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        
+        // Validate the request
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            // Add other fields as needed
+        ]);
+        
+        // Update the user
+        $user->update($validated);
+        
+        // Redirect with success message
+        return redirect()->route('admin.users.index')->with('success', 'User updated successfully');
+    }
 
     /**
      * Show the form for creating a new user.
@@ -109,16 +123,6 @@ class UserController extends Controller
     /**
      * Display the specified user.
      */
-    public function show(User $user)
-    {
-        // Verify access (admin or own profile)
-        if (!auth()->user()->isAdmin() && auth()->id() !== $user->id) {
-            return redirect()->route('dashboard')->with('error', 'No permission');
-        }
-
-        return view('users.show', compact('user'));
-    }
-
     /**
      * Show the form for editing the specified user.
      */
@@ -126,37 +130,20 @@ class UserController extends Controller
     /**
      * Update the specified user in storage.
      */
-    public function edit(Request $request, $id)
-    {
-        $user = User::findOrFail($id);
-    
-        // $request->validate([
-        //     'name' => 'required|string|max:255',
-        //     'email' => 'required|email|unique:users,email,' . $id,
-        // ]);
-    
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-        ]);
-    
-        return redirect()->route('admin.users.editUser')->with('success', 'User updated successfully.');
-    }
-    
+
+
+
 
     /**
      * Remove the specified user from storage.
      * Admin access only.
      */
-    public function destroy(User $user)
+    public function deleteUser($id)
     {
-        // Verify admin access
-        if (!auth()->user()->isAdmin()) {
-            return redirect()->route('dashboard')->with('error', 'No Permission');
-        }
-
+        $user = User::findOrFail($id);
         $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'User Deleted Successfully');
+        
+        return redirect()->back()->with('success', 'User deleted successfully');
     }
 
     /**
