@@ -19,11 +19,11 @@ class AdminController extends Controller
     /**
      * Constructor - Apply admin middleware
      */
-    public function __construct()
-    {
-        $this->middleware('admin');
-    }
-    
+    // public function __construct()
+    // {
+    //     $this->middleware('admin');
+    // }
+
     /**
      * Display admin dashboard with statistics
      */
@@ -31,35 +31,35 @@ class AdminController extends Controller
     {
         // Get counts for dashboard cards
         $stats = $this->getDashboardStats();
-        
+
         // Get registration stats (last 30 days)
         $thirtyDaysAgo = Carbon::now()->subDays(30);
         $userStats = $this->getUserStats($thirtyDaysAgo);
-        
+
         // Get application stats by status
         $applicationStats = Application::select('status', DB::raw('count(*) as count'))
             ->groupBy('status')
             ->pluck('count', 'status')
             ->toArray();
-        
+
         // Get most active job categories
         $popularCategories = JobCategory::withCount('jobs')
             ->orderBy('jobs_count', 'desc')
             ->take(5)
             ->get();
-        
+
         // Get recent activity
         $recentActivity = $this->getRecentActivity();
-        
+
         return view('admin.dashboard', compact(
-            'stats', 
-            'userStats', 
-            'applicationStats', 
-            'popularCategories', 
+            'stats',
+            'userStats',
+            'applicationStats',
+            'popularCategories',
             'recentActivity'
         ));
     }
-    
+
     /**
      * Collect dashboard statistics
      */
@@ -75,7 +75,7 @@ class AdminController extends Controller
             'totalCategories' => JobCategory::count(),
         ];
     }
-    
+
     /**
      * Get user statistics
      */
@@ -87,7 +87,7 @@ class AdminController extends Controller
             ->pluck('count', 'role')
             ->toArray();
     }
-    
+
     /**
      * Get recent activity items
      */
@@ -103,7 +103,7 @@ class AdminController extends Controller
                 'data' => $job,
                 'date' => $job->created_at,
             ]);
-        
+
         // Add recent applications
         $recentApplications = Application::with(['job', 'candidate'])
             ->latest()
@@ -114,13 +114,13 @@ class AdminController extends Controller
                 'data' => $application,
                 'date' => $application->created_at,
             ]);
-        
+
         // Merge and sort by date
         return $recentJobs->concat($recentApplications)
             ->sortByDesc('date')
             ->take(10);
     }
-    
+
     /**
      * Manage pending job approvals
      */
@@ -130,51 +130,51 @@ class AdminController extends Controller
             ->with(['company', 'employer', 'category'])
             ->latest()
             ->paginate(10);
-            
+
         return view('admin.jobs.pending', compact('pendingJobs'));
     }
-    
+
     /**
      * Approve a job
      */
     public function approveJob(Job $job)
     {
         $job->update(['is_approved' => true]);
-        
+
         // Notification logic could be added here
-        
+
         return redirect()->back()->with('success', 'Job approved successfully.');
     }
-    
+
     /**
      * Reject a job with reason
      */
     public function rejectJob(Request $request, Job $job)
     {
         $request->validate(['reason' => 'required|string|min:10']);
-        
+
         $job->update([
             'is_approved' => false,
             'is_active' => false
         ]);
-        
+
         // Notification logic with reason could be added here
-        
+
         return redirect()->back()->with('success', 'Job has been rejected.');
     }
-    
+
     /**
      * Manage users
      */
     public function users(Request $request)
     {
         $query = User::query();
-        
+
         // Apply filters
         if ($request->filled('role') && in_array($request->role, ['admin', 'employer', 'candidate'])) {
             $query->where('role', $request->role);
         }
-        
+
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -182,14 +182,14 @@ class AdminController extends Controller
                   ->orWhere('email', 'like', "%{$search}%");
             });
         }
-        
+
         $users = $query->with('profile')
             ->latest()
             ->paginate(15);
-            
+
         return view('admin.users.index', compact('users'));
     }
-    
+
     /**
      * Show user details
      */
@@ -201,10 +201,10 @@ class AdminController extends Controller
         } elseif ($user->role === 'candidate') {
             $user->load(['applications.job', 'resumes']);
         }
-        
+
         return view('admin.users.show', compact('user'));
     }
-    
+
     /**
      * Change user role
      */
@@ -213,18 +213,18 @@ class AdminController extends Controller
         $validated = $request->validate([
             'role' => 'required|in:admin,employer,candidate',
         ]);
-        
+
         // Prevent self-demotion
         if ($user->id === Auth::id() && $validated['role'] !== 'admin') {
             return redirect()->back()->with('error', 'You cannot demote yourself from admin role.');
         }
-        
+
         $user->update(['role' => $validated['role']]);
-        
+
         return redirect()->route('admin.users.show', $user)
             ->with('success', 'User role updated successfully.');
     }
-    
+
     /**
      * Manage featured jobs
      */
@@ -233,10 +233,10 @@ class AdminController extends Controller
         $featuredJobs = FeaturedJob::with(['job.company'])
             ->orderBy('priority', 'desc')
             ->paginate(10);
-            
+
         return view('admin.featured-jobs.index', compact('featuredJobs'));
     }
-    
+
     /**
      * Show form to add featured job
      */
@@ -247,10 +247,10 @@ class AdminController extends Controller
             ->whereDoesntHave('featuredJob')
             ->with('company')
             ->get();
-            
+
         return view('admin.featured-jobs.create', compact('availableJobs'));
     }
-    
+
     /**
      * Store a new featured job
      */
@@ -262,29 +262,29 @@ class AdminController extends Controller
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
         ]);
-        
+
         // Check if job is already featured
         if (FeaturedJob::where('job_id', $validated['job_id'])->exists()) {
             return redirect()->back()->with('error', 'This job is already featured.');
         }
-        
+
         FeaturedJob::create($validated);
-        
+
         return redirect()->route('admin.featured-jobs')
             ->with('success', 'Job featured successfully.');
     }
-    
+
     /**
      * Remove a job from featured
      */
     public function removeFeaturedJob(FeaturedJob $featuredJob)
     {
         $featuredJob->delete();
-        
+
         return redirect()->route('admin.featured-jobs')
             ->with('success', 'Job removed from featured list.');
     }
-    
+
     /**
      * Manage pending comments
      */
@@ -294,10 +294,10 @@ class AdminController extends Controller
             ->with(['commentable', 'user'])
             ->latest()
             ->paginate(15);
-            
+
         return view('admin.comments.pending', compact('pendingComments'));
     }
-    
+
     /**
      * System settings page
      */
@@ -305,7 +305,7 @@ class AdminController extends Controller
     {
         return view('admin.settings');
     }
-    
+
     /**
      * Update system settings
      */
@@ -313,11 +313,11 @@ class AdminController extends Controller
     {
         // Validate and save settings
         // Implementation would depend on your settings structure
-        
+
         return redirect()->route('admin.settings')
             ->with('success', 'Settings updated successfully.');
     }
-    
+
     /**
      * Generate system reports
      */
@@ -325,24 +325,24 @@ class AdminController extends Controller
     {
         $reportType = $request->type ?? 'jobs';
         $period = $request->period ?? 'month';
-        
+
         $data = match ($reportType) {
             'jobs' => $this->generateJobsReport($period),
             'applications' => $this->generateApplicationsReport($period),
             'users' => $this->generateUsersReport($period),
             default => []
         };
-        
+
         return view('admin.reports', compact('reportType', 'period', 'data'));
     }
-    
+
     /**
      * Generate jobs report
      */
     private function generateJobsReport($period)
     {
         $startDate = $this->getStartDateForPeriod($period);
-        
+
         return [
             'timeSeriesData' => $this->getTimeSeriesData(Job::class, $startDate),
             'categoryData' => Job::where('created_at', '>=', $startDate)
@@ -354,14 +354,14 @@ class AdminController extends Controller
                 ->toArray()
         ];
     }
-    
+
     /**
      * Generate applications report
      */
     private function generateApplicationsReport($period)
     {
         $startDate = $this->getStartDateForPeriod($period);
-        
+
         return [
             'timeSeriesData' => $this->getTimeSeriesData(Application::class, $startDate),
             'statusData' => Application::where('created_at', '>=', $startDate)
@@ -372,14 +372,14 @@ class AdminController extends Controller
                 ->toArray()
         ];
     }
-    
+
     /**
      * Generate users report
      */
     private function generateUsersReport($period)
     {
         $startDate = $this->getStartDateForPeriod($period);
-        
+
         return [
             'timeSeriesData' => $this->getTimeSeriesData(User::class, $startDate),
             'roleData' => User::where('created_at', '>=', $startDate)
@@ -390,7 +390,7 @@ class AdminController extends Controller
                 ->toArray()
         ];
     }
-    
+
     /**
      * Get time series data for a model
      */
@@ -406,7 +406,7 @@ class AdminController extends Controller
             ->pluck('count', 'date')
             ->toArray();
     }
-    
+
     /**
      * Get start date based on period
      */

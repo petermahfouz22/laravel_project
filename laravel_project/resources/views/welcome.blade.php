@@ -17,7 +17,7 @@
                 <div class="container mx-auto flex justify-between items-center">
                     <div class="text-2xl font-bold">JobFinder</div>
                     <ul class="hidden md:flex space-x-6">
-                        <li><a href="{{ route('welcome') }}" class="text-white font-medium hover:underline">Dashboard</a></li>
+                        <li><a href="{{ route('welcome') }}" class="text-white font-medium hover:underline">Home</a></li>
                         <li><a href="{{ route('about') }}" class="text-white font-medium hover:underline">About</a></li>
                         <li><a href="{{ route('job_search') }}" class="text-white font-medium hover:underline">Discover Jobs</a></li>
                         <li><a href="{{ route('job_category') }}" class="text-white font-medium hover:underline">Jobs by Industry</a></li>
@@ -47,7 +47,7 @@
                     </button>
                 </div>
                 <div id="mobile-menu"class="hidden md:hidden flex flex-col items-center w-full bg-gray-900 text-white p-5 space-y-4">
-                    <a href="#" class="hover:underline">Dashboard</a>
+                    <a href="#" class="hover:underline">Home</a>
                     <a href="#" class="hover:underline">About</a>
                     <a href="#" class="hover:underline">Discover Jobs</a>
                     <a href="#" class="hover:underline">Jobs by Industry</a>
