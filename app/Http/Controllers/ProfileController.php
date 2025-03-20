@@ -6,6 +6,7 @@ use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Redirect;
 
 class ProfileController extends Controller
 {
@@ -23,7 +24,7 @@ class ProfileController extends Controller
         
         $profile = $user->profile ?? new Profile();
         
-        return view('profiles.show', compact('user', 'profile'));
+        return view('profile.show', compact('user', 'profile'));
     }
 
     /**
@@ -34,7 +35,7 @@ class ProfileController extends Controller
         $user = auth()->user();
         $profile = $user->profile ?? new Profile();
         
-        return view('profiles.edit', compact('user', 'profile'));
+        return view('profile.edit', compact('user', 'profile'));
     }
 
     /**
@@ -100,5 +101,22 @@ class ProfileController extends Controller
         }
         
         return redirect()->route('profile.edit')->with('success', 'Delete your picture profile successfully');
+    }
+    public function destroy(Request $request): RedirectResponse
+    {
+        $request->validateWithBag('userDeletion', [
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $user = $request->user();
+
+        // Auth::logout();
+
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Redirect::to(path: '/');
     }
 }

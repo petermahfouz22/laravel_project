@@ -4,8 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
-
-
+use App\Http\Controllers\Admin\AdminController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,15 +34,12 @@ Route::get('/admin', function () {
     return view('admin.dashboard');
 })->name('admin.dashboard');
 Route::get('/users',[UserController::class,'index'])->name('admin.users.index');
-
-Route::get('/users/show/{id}', [UserController::class, 'show'])->name('admin.users.show');
+Route::get('/users/show/{id}', [UserController::class, 'show'])->name('AdminShowUser');
 Route::get('/admin/users/{id}/editUser', [UserController::class, 'editUser'])->name('editUser');
 Route::put('/admin/users/{id}/update', [UserController::class, 'updateUser'])->name('updateUser');
 Route::delete('/admin/users/{id}', [UserController::class, 'deleteUser'])->name('deleteUser');
-
-Route::get('/admin/addAdmin', function () {
-    return view('admin.addAdmin');
-})->name('addAdmin');
+Route::get('/admin/create', [AdminController::class, 'createAdmin'])->name('createAdmin');
+Route::post('/admin/create', [AdminController::class, 'storeAdmin'])->name('storeAdmin');
 
 
 
@@ -83,6 +79,8 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    // Route::get('/admin/createAdmin', [AdminController::class, 'createAdmin'])->name('createAdmin');
+    // Route::post('/admin/createAdmin', [AdminController::class, 'storeAdmin'])->name('createAdmin');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

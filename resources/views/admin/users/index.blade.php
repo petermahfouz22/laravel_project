@@ -47,7 +47,7 @@
         <td class="px-4 py-2 text-center">{{ $user->email }}</td>
         <td class="px-4 py-2 text-center">{{ $user->role }}</td>
         <td class="px-4 py-2 text-center">
-        <a href="{{ route('admin.users.show', $user->id) }}"
+        <a href="{{ route('AdminShowUser', $user->id) }}"
           class="text-white mr-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">
           <i class="fas fa-eye"></i> View
         </a>
@@ -56,11 +56,11 @@
           <i class="fas fa-edit"></i> Edit
         </a>
 
-
-        <form action="{{ route('deleteUser', $user->id)}}" method="POST" class="inline">
+        <form id="delete-form-{{ $user->id }}" action="{{ route('deleteUser', $user->id) }}" method="POST"
+          class="inline">
           @csrf
           @method('DELETE')
-          <button type="submit" onclick="return confirm('Are you sure you want to delete this user?');"
+          <button type="button" onclick="confirmDelete({{ $user->id }})"
           class="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg px-4 py-2 transition shadow-md">
           <i class="fas fa-trash"></i> Delete
           </button>
@@ -97,18 +97,19 @@
         <td class="px-4 py-2 text-center">{{ $candidate->name }}</td>
         <td class="px-4 py-2 text-center">{{ $candidate->email }}</td>
         <td class="px-4 py-2 text-center">
-        <a href=""
+        <a href="{{ route('AdminShowUser', $candidate->id) }}"
           class="text-white mr-2 bg-blue-600 hover:bg-blue-700 font-medium rounded-lg px-4 py-2 transition shadow-md inline-block">
           <i class="fas fa-eye"></i> View
         </a>
-        <a href="{{ route('editUser', $user->id) }}"
+        <a href="{{ route('editUser', $candidate->id) }}"
           class="text-white mr-2 bg-green-600 hover:bg-green-700 font-medium rounded-lg px-4 py-2 transition shadow-md inline-block">
           <i class="fas fa-edit"></i> Edit
         </a>
-        <form action="#" method="POST" class="inline">
+        <form id="delete-form-{{ $candidate->id }}" action="{{ route('deleteUser', $candidate->id) }}" method="POST"
+          class="inline">
           @csrf
           @method('DELETE')
-          <button type="submit" onclick="return confirm('Are you sure you want to delete this candidate?');"
+          <button type="button" onclick="confirmDelete({{ $user->id }})"
           class="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg px-4 py-2 transition shadow-md">
           <i class="fas fa-trash"></i> Delete
           </button>
@@ -141,18 +142,19 @@
         <td class="px-4 py-2 text-center">{{ $employer->name }}</td>
         <td class="px-4 py-2 text-center">{{ $employer->email }}</td>
         <td class="px-4 py-2 text-center">
-        <a href=""
+        <a href="{{ route('AdminShowUser', $employer->id) }}"
           class="text-white mr-2 bg-blue-600 hover:bg-blue-700 font-medium rounded-lg px-4 py-2 transition shadow-md inline-block">
           <i class="fas fa-eye"></i> View
         </a>
-        <a href="{{ route('editUser', $user->id) }}"
+        <a href="{{ route('editUser', $employer->id) }}"
           class="text-white mr-2 bg-green-600 hover:bg-green-700 font-medium rounded-lg px-4 py-2 transition shadow-md inline-block">
           <i class="fas fa-edit"></i> Edit
         </a>
-        <form action="" method="POST" class="inline">
+        <form id="delete-form-{{ $employer->id }}" action="{{ route('deleteUser', $employer->id) }}" method="POST"
+          class="inline">
           @csrf
           @method('DELETE')
-          <button type="submit" onclick="return confirm('Are you sure you want to delete this employer?');"
+          <button type="button" onclick="confirmDelete({{ $user->id }})"
           class="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg px-4 py-2 transition shadow-md">
           <i class="fas fa-trash"></i> Delete
           </button>
@@ -189,7 +191,7 @@
         <td class="px-4 py-2 text-center">{{ $admin->name }}</td>
         <td class="px-4 py-2 text-center">{{ $admin->email }}</td>
         <td class="px-4 py-2 text-center">
-        <a href=""
+        <a href="{{ route('AdminShowUser', $admin->id) }}"
           class="text-white mr-2 bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg px-4 py-2 transition duration-300 ease-in-out shadow-md inline-block">
           <i class="fas fa-eye"></i> View
         </a>
@@ -197,11 +199,12 @@
           class="text-white mr-2 bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg px-4 py-2 transition duration-300 ease-in-out shadow-md inline-block">
           <i class="fas fa-edit"></i> Edit
         </a>
-        <form action="" method="POST" class="inline">
+        <form id="delete-form-{{ $admin->id }}" action="{{ route('deleteUser', $admin->id) }}" method="POST"
+          class="inline">
           @csrf
           @method('DELETE')
-          <button type="submit" onclick="return confirm('Are you sure you want to delete this admin?');"
-          class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg px-4 py-2 transition duration-300 ease-in-out shadow-md">
+          <button type="button" onclick="confirmDelete({{ $admin->id }})"
+          class="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg px-4 py-2 transition shadow-md">
           <i class="fas fa-trash"></i> Delete
           </button>
         </form>
@@ -223,7 +226,7 @@
     </div>
     </div>
   </div>
-
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <!-- Custom JavaScript for Tab Switching -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -265,5 +268,21 @@
     });
     document.getElementById('allUsers').classList.remove('hidden');
     });
+    function confirmDelete(userId) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form-' + userId).submit();
+            }
+        });
+    }
+
   </script>
 @endsection
