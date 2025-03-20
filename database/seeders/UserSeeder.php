@@ -25,5 +25,6 @@ class UserSeeder extends Seeder
         // Create 10 Admins
         User::factory(10)->create([
             'role' => 'admin',
-        ]);    }
+        ]);    
+    }
 }

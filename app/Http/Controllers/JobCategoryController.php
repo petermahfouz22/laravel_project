@@ -2,165 +2,121 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\JobCategory;
-use App\Models\Job;
+use App\Models\Profile;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Redirect;
 
-class JobCategoryController extends Controller
+class ProfileController extends Controller
 {
     /**
-     * Display a listing of all job categories.
+     * Display the user's profile.
      */
-    public function index()
+    public function show($userId = null)
     {
-        // Get all categories with job count
-        $categories = JobCategory::withCount('jobs')
-            ->orderBy('name')
-            ->paginate(15);
-            
-        return view('categories.index', compact('categories'));
+        $user = $userId ? User::findOrFail($userId) : auth()->user();
+        
+        // Check if the profile viewing is public or belongs to the authenticated user
+        if ($userId && auth()->id() !== $user->id && !$user->profile?->public) {
+            return redirect()->route('dashboard')->with('error', 'THis profile personally not puplic');
+        }
+        
+        $profile = $user->profile ?? new Profile();
+        
+        return view('profile.show', compact('user', 'profile'));
     }
 
     /**
-     * Show the form for creating a new category (admin only).
+     * Show the form for editing the user's profile.
      */
-    public function create()
+    public function edit()
     {
-        // Check if user is admin
-        if (Auth::user()->role !== 'admin') {
-            return redirect()->route('categories.index')
-                ->with('error', 'Only administrators can create categories.');
-        }
+        $user = auth()->user();
+        $profile = $user->profile ?? new Profile();
         
-        return view('categories.create');
+        return view('profile.edit', compact('user', 'profile'));
     }
 
     /**
-     * Store a newly created category in storage.
+     * Update the user's profile.
      */
-    public function store(Request $request)
+    public function update(Request $request)
     {
-        // Check if user is admin
-        if (Auth::user()->role !== 'admin') {
-            return redirect()->route('categories.index')
-                ->with('error', 'Only administrators can create categories.');
-        }
+        $user = auth()->user();
         
-        // Validate request
+        // Validate the request
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:job_categories',
-            'description' => 'nullable|string'
+            'bio' => 'nullable|string|max:1000',
+            'location' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'profile_image' => 'nullable|image|max:2048', // max 2MB
+            'linkedin_url' => 'nullable|url|max:255',
+            'website' => 'nullable|url|max:255',
         ]);
         
-        // Create category
-        $category = new JobCategory();
-        $category->name = $validated['name'];
-        $category->slug = Str::slug($validated['name']);
-        $category->description = $validated['description'] ?? null;
-        $category->save();
-        
-        return redirect()->route('categories.index')
-            ->with('success', 'Category created successfully.');
-    }
-
-    /**
-     * Display the specified category along with its jobs.
-     */
-    public function show($slug)
-    {
-        // Find category by slug
-        $category = JobCategory::where('slug', $slug)->firstOrFail();
-        
-        // Get active and approved jobs in this category
-        $jobs = Job::where('category_id', $category->id)
-            ->where('is_active', true)
-            ->where('is_approved', true)
-            ->where('application_deadline', '>=', now())
-            ->with(['company', 'technologies'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        // Handle profile image upload
+        if ($request->hasFile('profile_image')) {
+            // Delete old image if exists
+            if ($user->profile && $user->profile->profile_image) {
+                Storage::delete('public/' . $user->profile->profile_image);
+            }
             
-        return view('categories.show', compact('category', 'jobs'));
-    }
-
-    /**
-     * Show the form for editing the category (admin only).
-     */
-    public function edit(JobCategory $category)
-    {
-        // Check if user is admin
-        if (Auth::user()->role !== 'admin') {
-            return redirect()->route('categories.index')
-                ->with('error', 'Only administrators can edit categories.');
+            $path = $request->file('profile_image')->store('profile_images', 'public');
+            $validated['profile_image'] = $path;
         }
         
-        return view('categories.edit', compact('category'));
-    }
-
-    /**
-     * Update the specified category in storage.
-     */
-    public function update(Request $request, JobCategory $category)
-    {
-        // Check if user is admin
-        if (Auth::user()->role !== 'admin') {
-            return redirect()->route('categories.index')
-                ->with('error', 'Only administrators can update categories.');
+        // Create or update profile
+        if ($user->profile) {
+            $user->profile->update($validated);
+        } else {
+            $user->profile()->create($validated);
         }
         
-        // Validate request
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:job_categories,name,' . $category->id,
-            'description' => 'nullable|string'
-        ]);
-        
-        // Update category
-        $category->name = $validated['name'];
-        $category->slug = Str::slug($validated['name']);
-        $category->description = $validated['description'] ?? null;
-        $category->save();
-        
-        return redirect()->route('categories.index')
-            ->with('success', 'Category updated successfully.');
-    }
-
-    /**
-     * Remove the specified category from storage.
-     */
-    public function destroy(JobCategory $category)
-    {
-        // Check if user is admin
-        if (Auth::user()->role !== 'admin') {
-            return redirect()->route('categories.index')
-                ->with('error', 'Only administrators can delete categories.');
-        }
-        
-        // Check if category has jobs
-        $jobCount = Job::where('category_id', $category->id)->count();
-        
-        if ($jobCount > 0) {
-            return redirect()->route('categories.index')
-                ->with('error', 'Cannot delete category with associated jobs. Please reassign jobs first.');
-        }
-        
-        // Delete category
-        $category->delete();
-        
-        return redirect()->route('categories.index')
-            ->with('success', 'Category deleted successfully.');
+        return redirect()->route('profile.show')->with('success', 'Profile updated successfully');
     }
     
     /**
-     * Get a list of all categories for API.
+     * Import profile data from LinkedIn.
+     * This is a bonus feature.
      */
-    public function apiList()
+    public function importFromLinkedIn(Request $request)
     {
-        $categories = JobCategory::select('id', 'name')
-            ->orderBy('name')
-            ->get();
-            
-        return response()->json($categories);
+        // This would require LinkedIn API integration
+        // Placeholder for bonus feature
+        
+        return redirect()->route('profile.edit')->with('info', ' For the purpose of importing data from LinkedIn is under development.');
+    }
+    
+    /**
+     * Remove the profile picture.
+     */
+    public function removeProfilePicture()
+    {
+        $user = auth()->user();
+        
+        if ($user->profile && $user->profile->profile_image) {
+            Storage::delete('public/' . $user->profile->profile_image);
+            $user->profile->update(['profile_image' => null]);
+        }
+        
+        return redirect()->route('profile.edit')->with('success', 'Delete your picture profile successfully');
+    }
+    public function destroy(Request $request): RedirectResponse
+    {
+        $request->validateWithBag('userDeletion', [
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $user = $request->user();
+
+        // Auth::logout();
+
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Redirect::to(path: '/');
     }
 }
