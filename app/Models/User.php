@@ -2,17 +2,6 @@
 
 namespace App\Models;
 
-<<<<<<< HEAD
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-
-class User extends Authenticatable
-{
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
-=======
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -22,35 +11,23 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
->>>>>>> a8ef134669f78db1c3426dba217de3914161e0ee
 
     /**
      * The attributes that are mass assignable.
      *
-<<<<<<< HEAD
-     * @var list<string>
-=======
      * @var array<int, string>
->>>>>>> a8ef134669f78db1c3426dba217de3914161e0ee
      */
     protected $fillable = [
         'name',
         'email',
         'password',
-<<<<<<< HEAD
-=======
         'role',
->>>>>>> a8ef134669f78db1c3426dba217de3914161e0ee
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-<<<<<<< HEAD
-     * @var list<string>
-=======
      * @var array<int, string>
->>>>>>> a8ef134669f78db1c3426dba217de3914161e0ee
      */
     protected $hidden = [
         'password',
@@ -58,20 +35,6 @@ class User extends Authenticatable
     ];
 
     /**
-<<<<<<< HEAD
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
-}
-=======
      * The attributes that should be cast.
      *
      * @var array<string, string>
@@ -153,4 +116,3 @@ class User extends Authenticatable
         return $this->role === 'candidate';
     }
 }
->>>>>>> a8ef134669f78db1c3426dba217de3914161e0ee
