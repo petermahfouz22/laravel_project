@@ -1,3 +1,34 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.relative {
+    position: relative;
+}
+
+.group:hover .group-hover\:block {
+    display: block;
+}
+
+/* Optional: Add smooth transition */
+.group-hover\:block {
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* Add a small transparent triangle to connect the dropdown to the button */
+.group-hover\:block:before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 10px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid white;
+}
+
+/* Ensure the navbar has a relative position for absolute positioning of the center links */
+nav {
+    position: relative;
+}
