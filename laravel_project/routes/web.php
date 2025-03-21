@@ -10,6 +10,10 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
+Route::get('/employer', function () {
+    return view('employer.dashboard');
+})->name('employer');
+
 Route::get('/job', function () {
     return view('job_search');
 })->name('job_search');
