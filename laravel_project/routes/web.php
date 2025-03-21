@@ -38,7 +38,7 @@ Route::get('/users/show/{id}', [UserController::class, 'show'])->name('admin.use
 Route::get('/admin/users/{id}/editUser', [UserController::class, 'editUser'])->name('editUser');
 Route::put('/admin/users/{id}/update', [UserController::class, 'updateUser'])->name('updateUser');
 Route::delete('/admin/users/{id}', [UserController::class, 'deleteUser'])->name('deleteUser');
-// Route::get('/admin/createAdmin', [AdminController::class, 'createAdmin'])->name('createAdmin');
+Route::get('/admin/createAdmin', [AdminController::class, 'createAdmin'])->name('createAdmin');
 // Route::post('/admin/createAdmin', [AdminController::class, 'storeAdmin'])->name('createAdmin');
 
 

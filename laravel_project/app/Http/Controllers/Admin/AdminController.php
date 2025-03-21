@@ -19,10 +19,10 @@ class AdminController extends Controller
     /**
      * Constructor - Apply admin middleware
      */
-    // public function __construct()
-    // {
-    //     $this->middleware('admin');
-    // }
+    public function __construct()
+    {
+        $this->middleware('admin');
+    }
 
     /**
      * Display admin dashboard with statistics
