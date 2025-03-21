@@ -93,10 +93,9 @@
 
     <!-- Main Content -->
     <div class="min-h-screen flex flex-col items-center pt-24 pb-12 bg-gradient-to-b from-gray-100 to-gray-200">
-
-        <!-- Content Slot -->
+        <!-- Content Slot (replaced with yield) -->
         <div class="w-full sm:max-w-lg px-6 py-8 bg-white shadow-xl rounded-xl border border-gray-200">
-            {{ $slot }}
+            @yield('content')
         </div>
     </div>
 

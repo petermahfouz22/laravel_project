@@ -18,7 +18,7 @@
     <nav class="bg-gray-800 text-white shadow-md p-4 flex justify-between items-center">
         <!-- Left side: Employer -->
         <div class="flex items-center">
-            <a href="/" class="text-lg font-semibold">Employer</a>
+            <a href="/" class="text-lg font-semibold">JopFinder</a>
         </div>
 
         <!-- Center: Navigation Links -->
@@ -54,15 +54,16 @@
 
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-6 mt-5">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center md:text-left">
+<!-- Footer -->
+<footer class="bg-gray-800 text-white py-6 mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
-                    <h5 class="text-lg font-semibold">JobFinder</h5>
-                    <p>Find and manage the best talent for your organization.</p>
+                    <h5 class="text-lg font-semibold mb-4">JobFinder</h5>
+                    <p class="text-gray-300">Find and manage the best talent for your organization.</p>
                 </div>
                 <div>
-                    <h5 class="text-lg font-semibold">Quick Links</h5>
+                    <h5 class="text-lg font-semibold mb-4">Quick Links</h5>
                     <ul class="space-y-2">
                         <li><a href="/" class="text-gray-300 hover:text-white">Home</a></li>
                         <li><a href="/candidates" class="text-gray-300 hover:text-white">Candidates</a></li>
@@ -71,13 +72,15 @@
                     </ul>
                 </div>
                 <div>
-                    <h5 class="text-lg font-semibold">Contact Us</h5>
-                    <p>Email: info@candidateportal.com</p>
-                    <p>Phone: (123) 456-7890</p>
+                    <h5 class="text-lg font-semibold mb-4">Contact Us</h5>
+                    <address class="not-italic">
+                        <p class="text-gray-300">Email: info@candidateportal.com</p>
+                        <p class="text-gray-300">Phone: (123) 456-7890</p>
+                    </address>
                 </div>
             </div>
-            <div class="text-center mt-6">
-                <p class="text-gray-400">&copy; 2025 Candidate Portal. All rights reserved.</p>
+            <div class="mt-8 border-t border-gray-700 pt-4 text-center">
+                <p class="text-gray-300">&copy; {{ date('Y') }} JobFinder. All rights reserved.</p>
             </div>
         </div>
     </footer>
