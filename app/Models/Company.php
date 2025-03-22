@@ -18,6 +18,7 @@ class Company extends Model
         'user_id',
         'name',
         'description',
+        'slug',
         'logo',
         'website',
         'location',

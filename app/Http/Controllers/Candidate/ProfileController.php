@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Candidate;
 
 use App\Http\Controllers\Controller;
@@ -13,14 +12,13 @@ class ProfileController extends Controller
 {
     public function index()
     {
-        return view('candidate.profile');
+        $user = auth()->user();
+        return view('candidate.profile.index', compact('user'));
     }
 
     public function update(ProfileUpdateRequest $request, UpdateProfileRequest $extendedRequest): RedirectResponse
     {
-        /** @var User $user */
         $user = auth()->user();
-
         $basicData = $request->validated();
         $extendedData = $extendedRequest->validated();
 
@@ -34,14 +32,26 @@ class ProfileController extends Controller
 
         return redirect()->route('candidate.profile.index')->with('status', 'Profile updated!');
     }
-
+    public function edit()
+    {
+        $user = auth()->user();
+        return view('candidate.profile.edit', compact('user'));
+    }
+    public function resumes()
+    {
+        $user = auth()->user()->load('resumes');
+        return view('candidate.profile.resumes', compact('user'));
+    }
     public function storeResume(StoreResumeRequest $request): RedirectResponse
     {
-        /** @var User $user */
         $user = auth()->user();
-
         $resumeData = $request->validated();
-        // Assuming a Resume model exists
+
+        if ($request->hasFile('resume')) {
+            $resumePath = $request->file('resume')->store('resumes', 'public');
+            $resumeData = ['path' => $resumePath];
+        }
+
         $user->resumes()->create($resumeData);
 
         return redirect()->route('candidate.profile.index')->with('status', 'Resume uploaded!');

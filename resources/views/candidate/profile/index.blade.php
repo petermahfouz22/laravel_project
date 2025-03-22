@@ -1,28 +1,29 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">My Profile</h2>
+    </x-slot>
 
-@section('content')
-<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 py-8">
-    <h1 class="text-3xl font-bold mb-6">Your Profile</h1>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            @if (session('status'))
+                <div class="mb-4 p-4 bg-green-100 text-green-700 rounded">{{ session('status') }}</div>
+            @endif
 
-    <div class="bg-white p-6 rounded-lg shadow-md">
-        <div class="flex items-center mb-6">
-            <img src="{{ $profile->profile_image ?? 'default-avatar.png' }}" alt="Profile Image" class="w-24 h-24 rounded-full mr-4">
-            <div>
-                <h2 class="text-2xl font-semibold">{{ Auth::user()->name }}</h2>
-                <p class="text-gray-600">{{ $profile->location ?? 'Not specified' }}</p>
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <h1 class="text-2xl font-bold mb-4">Profile Overview</h1>
+                    <p><strong>Name:</strong> {{ $user->name }}</p>
+                    <p><strong>Email:</strong> {{ $user->email }}</p>
+                    @if ($user->phone)<p><strong>Phone:</strong> {{ $user->phone }}</p>@endif
+                    @if ($user->bio)<p><strong>Bio:</strong> {{ $user->bio }}</p>@endif
+                    <p><strong>Resumes:</strong> {{ $user->resumes->count() }}</p>
+
+                    <div class="mt-4">
+                        <a href="{{ route('candidate.profile.edit') }}" class="text-blue-600 hover:underline">Edit Profile</a> |
+                        <a href="{{ route('candidate.profile.resumes') }}" class="text-blue-600 hover:underline">Manage Resumes</a>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <nav class="flex space-x-4 mb-6">
-            <a href="{{ route('candidate.profile.personal') }}" class="text-blue-600 hover:underline">Personal Info</a>
-            <a href="{{ route('candidate.profile.resume') }}" class="text-blue-600 hover:underline">Resume</a>
-            <a href="{{ route('candidate.profile.skills') }}" class="text-blue-600 hover:underline">Skills</a>
-            <a href="{{ route('candidate.profile.portfolio') }}" class="text-blue-600 hover:underline">Portfolio</a>
-        </nav>
-
-        <div>
-            @yield('profile-content')
-        </div>
     </div>
-</div>
-@endsection
+</x-app-layout>

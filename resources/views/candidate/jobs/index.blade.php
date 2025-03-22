@@ -67,7 +67,7 @@
                                             </p>
                                         </div>
                                         <div>
-                                            <a href="{{ route('candidate.applications.create', ['job' => $job->id])) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm">
+                                            <a href="{{ route('candidate.applications.create', ['job' => $job->id]) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm">
                                                 Apply Now
                                             </a>
                                         </div>

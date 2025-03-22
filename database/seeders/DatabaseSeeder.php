@@ -15,6 +15,10 @@ class DatabaseSeeder extends Seeder
             JobCategorySeeder::class,
             TechnologySeeder::class,
             JobSeeder::class,
+            ApplicationSeeder::class,
+            ResumeSeeder::class,
+            InterviewSeeder::class,
+            FeaturedJobSeeder::class,
         ]);
     }
 }
