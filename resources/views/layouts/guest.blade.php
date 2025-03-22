@@ -66,14 +66,20 @@
             </div>
 
             <!-- Mobile Menu -->
-            <div id="mobile-menu"class="hidden md:hidden flex flex-col items-center w-full bg-gray-900 text-white p-6 space-y-4">
-                <a href="{{ route('welcome') }}" class="text-white font-medium hover:text-teal-300 transition-colors">Home</a>
-                <a href="{{ route('about') }}" class="text-white font-medium hover:text-teal-300 transition-colors">About</a>
-                <a href="{{ route('job_search') }}" class="text-white font-medium hover:text-teal-300 transition-colors">Discover
+            <div id="mobile-menu"
+                class="hidden md:hiddenflex flex-col items-center w-full bg-gray-900 text-white p-6 space-y-4">
+                <a href="{{ route('welcome') }}"
+                    class="text-white font-medium hover:text-teal-300 transition-colors">Home</a>
+                <a href="{{ route('about') }}"
+                    class="text-white font-medium hover:text-teal-300 transition-colors">About</a>
+                <a href="{{ route('job_search') }}"
+                    class="text-white font-medium hover:text-teal-300 transition-colors">Discover
                     Jobs</a>
-                <a href="{{ route('job_category') }}" class="text-white font-medium hover:text-teal-300 transition-colors">Jobs
+                <a href="{{ route('job_category') }}"
+                    class="text-white font-medium hover:text-teal-300 transition-colors">Jobs
                     by Industry</a>
-                <a href="{{ route('contact us') }}" class="text-white font-medium hover:text-teal-300 transition-colors">Contact
+                <a href="{{ route('contact us') }}"
+                    class="text-white font-medium hover:text-teal-300 transition-colors">Contact
                     Us</a>
                 @auth
                     <a href="{{ url('/dashboard') }}"
@@ -91,14 +97,16 @@
         </nav>
     @endif
 
+
     <!-- Main Content -->
     <div class="min-h-screen flex flex-col items-center pt-24 pb-12 bg-gradient-to-b from-gray-100 to-gray-200">
-
-        <!-- Content Slot -->
+        <!-- Content Slot (replaced with yield) -->
         <div class="w-full sm:max-w-lg px-6 py-8 bg-white shadow-xl rounded-xl border border-gray-200">
-            {{ $slot }}
+            @yield('content')
         </div>
     </div>
+
+
 
     <!-- Footer -->
     <footer class="bg-gray-900 text-white py-6 text-center">

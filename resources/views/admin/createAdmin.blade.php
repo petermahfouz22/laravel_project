@@ -1,75 +1,72 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="py-12">
-    <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 bg-white border-b border-gray-200">
-                <h2 class="text-2xl font-bold mb-6">Create New Admin</h2>
-                
-                @if ($errors->any())
-                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
-                        <p class="font-bold">Please fix the following errors:</p>
-                        <ul class="list-disc ml-5">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-                
-                <form action="{{ route('createAdmin') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    
-                    <div class="mb-4">
-                        <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name</label>
-                        <input type="text" name="name" id="name" value="{{ old('name') }}" 
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            required>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                        <input type="email" name="email" id="email" value="{{ old('email') }}" 
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            required>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                        <input type="password" name="password" id="password" 
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            required>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="password_confirmation" class="block text-gray-700 text-sm font-bold mb-2">Confirm Password</label>
-                        <input type="password" name="password_confirmation" id="password_confirmation" 
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            required>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label for="profile_image" class="block text-gray-700 text-sm font-bold mb-2">Profile Image (Optional)</label>
-                        <input type="file" name="profile_image" id="profile_image" 
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <p class="text-gray-500 text-xs mt-1">Max file size: 2MB. Accepted formats: JPG, PNG, GIF.</p>
-                    </div>
-                    
-                    <div class="flex items-center justify-between">
-                        <button type="submit" 
-                            class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                            Create Admin
-                        </button>
-                        
-                        <a href="{{ route('admin.users.index') }}" 
-                            class="text-gray-500 hover:text-gray-700 font-medium">
-                            Cancel
-                        </a>
-                    </div>
-                </form>
-            </div>
+    <div class="max-w-lg mx-auto bg-white shadow-lg rounded-lg p-8 mt-12">
+        <div class="text-center">
+            <h1 class="text-4xl font-bold text-gray-800 mb-6">Create New Admin</h1>
         </div>
+        
+        @if ($errors->any())
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+                <p class="font-bold">Please fix the following errors:</p>
+                <ul class="list-disc ml-5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        
+        <form action="{{ route('createAdmin') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+            @csrf
+            
+            <!-- Name Field -->
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                <input type="text" id="name" name="name" value="{{ old('name') }}" 
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" 
+                    required>
+            </div>
+            
+            <!-- Email Field -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" id="email" name="email" value="{{ old('email') }}" 
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" 
+                    required>
+            </div>
+            
+            <!-- Password Field -->
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" id="password" name="password" 
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" 
+                    required>
+            </div>
+            
+            <!-- Confirm Password Field -->
+            <div>
+                <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                <input type="password" id="password_confirmation" name="password_confirmation" 
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" 
+                    required>
+            </div>
+            
+            <!-- Profile Image Field -->
+            <div>
+                <label for="profile_image" class="block text-sm font-medium text-gray-700">Profile Image (Optional)</label>
+                <input type="file" id="profile_image" name="profile_image" 
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <p class="text-gray-500 text-xs mt-1">Max file size: 2MB. Accepted formats: JPG, PNG, GIF.</p>
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit" 
+                    class="w-full bg-gray-900 text-white py-2 px-4 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Create Admin
+                </button>
+            </div>
+        </form>
     </div>
-</div>
-@endSection
+@endsection

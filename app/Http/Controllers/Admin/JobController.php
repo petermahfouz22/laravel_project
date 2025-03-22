@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\Models\Job;
+use App\Http\Controllers\Controller;
 use App\Models\JobCategory;
 use App\Models\Technology;
 use App\Models\Application;
@@ -15,7 +16,7 @@ class JobController extends Controller
     /**
      * Display a listing of the jobs.
      */
-    public function index(Request $request)
+    public function adminJobsIndex(Request $request)
     {
         // Retrieve search parameters
         $search = $request->input('search');
@@ -66,7 +67,7 @@ class JobController extends Controller
         $categories = JobCategory::all();
         $technologies = Technology::all();
 
-        return view('jobs.index', compact('jobs', 'categories', 'technologies', 'search', 'location', 'category', 'workType', 'technology'));
+        return view('admin.jobs.index', compact('jobs', 'categories', 'technologies', 'search', 'location', 'category', 'workType', 'technology'));
     }
 
     /**

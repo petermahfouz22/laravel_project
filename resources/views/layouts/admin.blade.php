@@ -34,8 +34,8 @@
                     <div class="hidden md:ml-6 md:flex md:items-center md:space-x-4">
                         <a href="{{ route('admin.dashboard') }}"
                             class="px-3 py-2 rounded-md text-sm font-medium bg-gray-900">Dashboard</a>
-                        <a href="{{ route('admin.users.index') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Users</a>
-                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Jobs</a>
+                        <a href="{{ route('users') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Users</a>
+                        <a href="{{ route('jobs') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Jobs</a>
                         <!-- <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Analytics</a>
                         <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Settings</a> -->
                     </div>

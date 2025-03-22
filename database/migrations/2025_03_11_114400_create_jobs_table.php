@@ -24,7 +24,7 @@ return new class extends Migration
             // Job category
             $table->foreignId('category_id')->constrained('job_categories')->onDelete('cascade')
                   ->comment('The category this job belongs to');
-            
+
             $table->string('title')->comment('Job title/position');
             $table->string('slug')->unique()->comment('URL-friendly version of title for routing');
             $table->text('description')->comment('Full job description');

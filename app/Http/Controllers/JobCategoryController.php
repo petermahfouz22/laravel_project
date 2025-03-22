@@ -13,16 +13,60 @@ class JobCategoryController extends Controller
     /**
      * Display a listing of all job categories.
      */
-    public function index()
-    {
-        // Get all categories with job count
-        $categories = JobCategory::withCount('jobs')
-            ->orderBy('name')
-            ->paginate(15);
-            
-        return view('categories.index', compact('categories'));
-    }
 
+     
+    public function adminJobsIndex(Request $request)
+    {
+        // Verify admin access
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access this page.');
+        }
+        
+        // Base query for jobs
+        $query = Job::with(['company', 'employer', 'category']);
+        
+        // Apply filters
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhereHas('company', function($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+        
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->input('category'));
+        }
+        
+        if ($request->filled('status')) {
+            switch ($request->input('status')) {
+                case 'approved':
+                    $query->where('is_approved', true);
+                    break;
+                case 'pending':
+                    $query->where('is_approved', false);
+                    break;
+                case 'active':
+                    $query->where('is_active', true);
+                    break;
+                case 'inactive':
+                    $query->where('is_active', false);
+                    break;
+            }
+        }
+        
+        // Order by creation date, most recent first
+        $jobs = $query->orderBy('created_at', 'desc')->paginate(10);
+        
+        // Get all categories for filters
+        $categories = JobCategory::all();
+        
+        return view('admin.jobs.index', compact('jobs', 'categories'));
+    }
     /**
      * Show the form for creating a new category (admin only).
      */
