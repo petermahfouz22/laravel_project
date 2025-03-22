@@ -20,6 +20,7 @@
                           &larr; {{ __('Back to Job Details') }}
                       </a>
                   </div>
+                  
 
                   @if($applications->count() > 0)
                       <div class="overflow-x-auto">

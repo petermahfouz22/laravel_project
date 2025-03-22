@@ -38,7 +38,7 @@
                             class="text-white font-medium hover:text-teal-300 transition-colors">Discover Jobs</a></li>
                     <li><a href="{{ route('job_category')}}"
                             class="text-white font-medium hover:text-teal-300 transition-colors">Jobs by Industry</a></li>
-                    <li><a href="{{ route('contact us')}}"
+                    <li><a href="{{ route('contact_us') }}"
                             class="text-white font-medium hover:text-teal-300 transition-colors">Contact Us</a></li>
                 </ul>
 

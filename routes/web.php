@@ -35,8 +35,20 @@ Route::get('/jobs/show', function () {
 })->name('jobs.show');
 
 // Authentication routes
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/dashboard', function () {
-    return view('dashboard');
+  if (auth()->user()->role === 'employer') {
+      return redirect()->route('employer.dashboard');}
+  // } elseif (auth()->user()->role === 'candidate') {
+  //     return redirect()->route('candidate.dashboard');
+  // } elseif (auth()->user()->role === 'admin') {
+  //     return redirect()->route('admin.dashboard');
+  // }
+  
+  // Default fallback if role doesn't match any specific dashboard
+  return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

@@ -113,11 +113,7 @@
                               View Company Profile
                           </a>
                       </li>
-                      <li>
-                          <a href="{{ route('employer.companies.create') }}" class="text-blue-600 hover:underline block p-2 hover:bg-gray-50 rounded">
-                              Update Company Information
-                          </a>
-                      </li>
+                    
                   </ul>
               </div>
           </div>
