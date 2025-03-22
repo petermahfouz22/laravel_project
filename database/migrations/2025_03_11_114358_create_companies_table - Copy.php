@@ -14,7 +14,7 @@ return new class extends Migration
     Schema::create('companies', function (Blueprint $table) {
         $table->id();
         // Link to employer user - only employer role users will have companies
-        $table->foreignId('user_id')->constrained()->onDelete('cascade')
+        $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade')
               ->comment('Link to the employer user who owns this company');
         $table->string('name')->comment('Company name');
         $table->text('description')->comment('Detailed company description');

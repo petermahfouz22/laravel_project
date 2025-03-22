@@ -1,105 +1,57 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Candidate\ApplicationController as CandidateApplicationController;
+use App\Http\Controllers\Candidate\DashboardController as CandidateDashboardController;
+use App\Http\Controllers\Candidate\JobController as CandidateJobController;
+use App\Http\Controllers\Candidate\MessageController as CandidateMessageController;
+use App\Http\Controllers\Candidate\ProfileController as CandidateProfileController;
+use App\Http\Controllers\Employer\DashboardController as EmployerDashboardController;
 use Illuminate\Support\Facades\Route;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\HomeController;
 
+Route::middleware('guest')->group(function () {
+    Route::get('/', [HomeController::class, 'index'])->name('welcome');
+    Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('register', [RegisteredUserController::class, 'store'])->name('register');
+    Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    Route::get('/jobs/{job}', [CandidateJobController::class, 'show'])->name('jobs.show'); // New show route
+    Route::get('/jobs', [CandidateJobController::class, 'index'])->name('jobs.index');
+    Route::post('/jobs/{job}/save', [CandidateJobController::class, 'save'])->name('jobs.save'); // New
 
-Route::get('/', function () {
-    return view('welcome');
 });
-//testing routes
-
-Route::get('/candidate/profile', function(){
-    return view('candidate.profile');
-});
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::middleware('role:candidate')->prefix('candidate')->name('candidate.')->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [CandidateDashboardController::class, 'index'])->name('dashboard');
+
+        // Profile (Updated to ProfileController)
+        Route::get('/profile', [CandidateProfileController::class, 'index'])->name('profile.index');
+        Route::post('/profile', [CandidateProfileController::class, 'update'])->name('profile.update');
+        Route::post('/resume', [CandidateProfileController::class, 'storeResume'])->name('resume.store');
+
+        // Jobs
+        Route::get('/jobs', [CandidateJobController::class, 'index'])->name('jobs.index');
+        Route::get('/jobs/search', [CandidateJobController::class, 'search'])->name('jobs.search');
+        Route::get('/jobs/{job}', [CandidateJobController::class, 'show'])->name('jobs.show'); // New show route
+        // Applications
+        Route::get('/applications', [CandidateApplicationController::class, 'index'])->name('applications.index');
+       // Show the application form (GET)
+Route::get('/candidate/applications/create/{job}', [CandidateApplicationController::class, 'create'])->name('candidate.applications.create');
+
+// Submit the application (POST)
+Route::post('/candidate/applications/store/{job}', [CandidateApplicationController::class, 'store'])->name('candidate.applications.store');
+        // Messages
+        Route::get('/messages', [CandidateMessageController::class, 'index'])->name('messages.index');
+        Route::post('/messages', [CandidateMessageController::class, 'store'])->name('messages.store');
+    });
+
+    // Route::middleware('role:employer')->prefix('employer')->name('employer.')->group(function () {
+    //     Route::get('/dashboard', [EmployerDashboardController::class, 'index'])->name('dashboard');
+    // });
+
+    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
-
-use Laravel\Socialite\Facades\Socialite;
-
-// Redirect to GitHub
-Route::get('/auth/redirect', function () {
-    return Socialite::driver('github')->redirect();
-});
-
-// Handle GitHub callback
-Route::get('/auth/callback', function () {
-    $githubUser = Socialite::driver('github')->user();
-
-    // Find or create the user
-    $user = User::firstOrCreate(
-        ['email' => $githubUser->getEmail()],
-        [
-            'name' => $githubUser->getName(),
-            'provider_id' => $githubUser->getId(),
-            'provider' => 'github',
-        ]
-    );
-
-    // Log in the user
-    Auth::login($user);
-
-    // Redirect to dashboard or home page
-    return redirect('/dashboard');
-});
-
-// Google OAuth
-Route::get('/auth/google/redirect', function () {
-    return Socialite::driver('google')->redirect();
-});
-
-Route::get('/auth/google/callback', function () {
-    $googleUser = Socialite::driver('google')->user();
-
-    // Find or create the user
-    $user = User::firstOrCreate(
-        ['email' => $googleUser->getEmail()],
-        [
-            'name' => $googleUser->getName(),
-            'provider_id' => $googleUser->getId(),
-            'provider' => 'google',
-        ]
-    );
-
-    // Log in the user
-    Auth::login($user);
-
-    // Redirect to dashboard
-    return redirect('/welcome');
-});
-
-// Facebook OAuth
-Route::get('/auth/facebook/redirect', function () {
-    return Socialite::driver('facebook')->redirect();
-});
-
-Route::get('/auth/facebook/callback', function () {
-    $facebookUser = Socialite::driver('facebook')->user();
-
-    // Find or create the user
-    $user = User::firstOrCreate(
-        ['email' => $facebookUser->getEmail()],
-        [
-            'name' => $facebookUser->getName(),
-            'provider_id' => $facebookUser->getId(),
-            'provider' => 'facebook',
-        ]
-    );
-
-    // Log in the user
-    Auth::login($user);
-
-    // Redirect to dashboard
-    return redirect('/dashboard');
-});
-require __DIR__.'/auth.php';

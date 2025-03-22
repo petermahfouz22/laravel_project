@@ -9,20 +9,18 @@ class Technology extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'name',
+        'name', 'slug', // Include slug from your migration
     ];
 
-    /**
-     * Get the jobs associated with this technology.
-     */
     public function jobs()
     {
-        return $this->belongsToMany(Job::class);
+        return $this->belongsToMany(Job::class, 'job_technology'); // Specify pivot table
+    }
+
+    // Add this for profile skills
+    public function profiles()
+    {
+        return $this->belongsToMany(Profile::class, 'profile_technology', 'technology_id', 'profile_id');
     }
 }

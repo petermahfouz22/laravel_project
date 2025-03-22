@@ -9,35 +9,12 @@ class Job extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'employer_id',
-        'company_id',
-        'category_id',
-        'title',
-        'slug',
-        'description',
-        'responsibilities',
-        'requirements',
-        'benefits',
-        'location',
-        'work_type',
-        'salary_min',
-        'salary_max',
-        'application_deadline',
-        'is_active',
-        'is_approved',
+        'employer_id', 'company_id', 'category_id', 'title', 'slug', 'description',
+        'responsibilities', 'requirements', 'benefits', 'location', 'work_type',
+        'salary_min', 'salary_max', 'application_deadline', 'is_active', 'is_approved',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'application_deadline' => 'date',
         'is_active' => 'boolean',
@@ -46,84 +23,76 @@ class Job extends Model
         'salary_max' => 'decimal:2',
     ];
 
-    /**
-     * Get the employer who posted the job.
-     */
     public function employer()
     {
         return $this->belongsTo(User::class, 'employer_id');
     }
 
-    /**
-     * Get the company associated with the job.
-     */
     public function company()
     {
         return $this->belongsTo(Company::class);
     }
 
-    /**
-     * Get the category of the job.
-     */
     public function category()
     {
         return $this->belongsTo(JobCategory::class, 'category_id');
     }
 
-    /**
-     * Get the technologies required for the job.
-     */
     public function technologies()
     {
-        return $this->belongsToMany(Technology::class);
+        return $this->belongsToMany(Technology::class, 'job_technology'); // Specify pivot table
     }
 
-    /**
-     * Get the applications for the job.
-     */
     public function applications()
     {
         return $this->hasMany(Application::class);
     }
 
-    /**
-     * Get the comments for the job.
-     */
     public function comments()
     {
         return $this->morphMany(Comment::class, 'commentable');
     }
 
-    /**
-     * Get the featured job entry if this job is featured.
-     */
     public function featuredJob()
     {
         return $this->hasOne(FeaturedJob::class);
     }
 
-    /**
-     * Check if the job is featured.
-     */
+    // Add this for saved jobs
+    public function savedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'saved_jobs', 'job_id', 'user_id')
+                    ->withTimestamps();
+    }
+
     public function isFeatured()
     {
         return $this->featuredJob()->exists();
     }
 
-    /**
-     * Increment the views count.
-     */
     public function incrementViews()
     {
         $this->increment('views_count');
     }
 
-    /**
-     * Scope a query to only include active and approved jobs.
-     */
     public function scopeActiveAndApproved($query)
     {
-        return $query->where('is_active', true)
-                    ->where('is_approved', true);
+        return $query->where('is_active', true)->where('is_approved', true);
+    }
+
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when($filters['search'] ?? false, fn($query, $search) =>
+            $query->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%"));
+
+        $query->when($filters['location'] ?? false, fn($query, $location) =>
+            $query->where('location', 'like', "%{$location}%"));
+
+        $query->when($filters['work_type'] ?? false, fn($query, $work_type) =>
+            $query->where('work_type', $work_type));
+
+        $query->when($filters['category_id'] ?? false, fn($query, $category_id) =>
+            $query->where('category_id', $category_id));
     }
 }

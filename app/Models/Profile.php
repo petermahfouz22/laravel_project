@@ -31,4 +31,9 @@ class Profile extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function technologies()
+    {
+        return $this->belongsToMany(Technology::class, 'profile_technology', 'profile_id', 'technology_id');
+    }
 }

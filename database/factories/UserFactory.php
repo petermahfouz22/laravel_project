@@ -29,6 +29,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'role' => 'candidate', // Default role
         ];
     }
 
@@ -39,6 +40,26 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is an employer.
+     */
+    public function employer(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'employer'
+        ]);
+    }
+
+    /**
+     * Indicate that the user is a candidate.
+     */
+    public function candidate(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'candidate',
         ]);
     }
 }
