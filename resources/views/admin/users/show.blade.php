@@ -5,23 +5,27 @@
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-2xl font-semibold">User Details</h2>
             <div class="flex space-x-2">
-                <a href="{{ route('editUser', $user->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                <a href="{{ route('admin.users.edit', $user->id) }}"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
                     <i class="fas fa-edit mr-1"></i> Edit
                 </a>
-                <form action="{{ route('deleteUser', $user->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this user?')">
+                <form id="delete-form-{{ $user->id }}" action="{{ route('deleteUser', $user->id) }}" method="POST"
+                    class="inline">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
-                        <i class="fas fa-trash mr-1"></i> Delete
+                    <button type="button" onclick="confirmDelete({{ $user->id }})"
+                        class="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg px-4 py-2 transition shadow-md">
+                        <i class="fas fa-trash"></i> Delete
                     </button>
                 </form>
             </div>
         </div>
-        
+
         <div class="flex mb-6">
             <div class="w-1/3">
                 @if($user->profile_image)
-                    <img src="{{ asset('storage/' . $user->profile_image) }}" alt="{{ $user->name }}" class="w-32 h-32 rounded-full object-cover">
+                    <img src="{{ asset("storage/{$user->profile_image}") }}" alt="{{ $user->name }}"
+                        class="w-32 h-32 rounded-full object-cover">
                 @else
                     <div class="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center">
                         <span class="text-3xl text-gray-500">{{ substr($user->name, 0, 1) }}</span>
@@ -65,4 +69,23 @@
             </div>
         @endif
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(userId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(`delete-form-${userId}`).submit();
+                }
+            });
+        }
+    </script>
 @endsection

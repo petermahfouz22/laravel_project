@@ -22,7 +22,7 @@
 
                 <!-- Search and Filter Section -->
                 <div class="mb-4 p-4 bg-gray-50 rounded-lg">
-                    <form action="{{ route('jobs') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <form action="{{ route('admin.jobs.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
                             <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
                             <input type="text" name="search" id="search" value="{{ request('search') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
@@ -90,11 +90,11 @@
                                         {{ $job->company->name ?? 'N/A' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                             {{ $job->is_approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                             {{ $job->is_approved ? 'Approved' : 'Pending' }}
                                         </span>
-                                        <span class="ml-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        <span class="ml-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                             {{ $job->is_active ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }}">
                                             {{ $job->is_active ? 'Active' : 'Inactive' }}
                                         </span>
@@ -124,7 +124,7 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div class="mt-4">
                     {{ $jobs->links() }}
                 </div>

@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
-use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\JobController;
 
 Route::get('/', function () {
@@ -40,18 +40,20 @@ Route::get('/candidate', function () {
 })->name('candidate');
 //!>>>>>>>>>>>>>>>>>>>>>>>>>>Admin User Management Routes>>>>>>>>>>>>>>>>>>>>>>>>
 
-Route::get('/users',[UserController::class,'index'])->name('users');
-Route::get('/users/show/{id}', [UserController::class, 'show'])->name('AdminShowUser');
-Route::get('/admin/users/{id}/editUser', [UserController::class, 'editUser'])->name('editUser');
-Route::put('/admin/users/{id}/update', [UserController::class, 'updateUser'])->name('updateUser');
-Route::delete('/admin/users/{id}', [UserController::class, 'deleteUser'])->name('deleteUser');
-Route::get('/admin/create', [AdminController::class, 'createAdmin'])->name('createAdmin');
-Route::post('/admin/create', [AdminController::class, 'storeAdmin'])->name('storeAdmin');
+Route::get('/users',[AdminController::class,'AdminIndexUser'])->name('admin.users.index');
+Route::get('/users/show/{id}', [AdminController::class, 'AdminShowUser'])->name('admin.users.show');
+Route::get('/admin/users/{id}/editUser', [AdminController::class, 'AdminEditUser'])->name('admin.users.edit');
+Route::put('/admin/users/{id}/update', [AdminController::class, 'AdminUpdateUser'])->name('updateUser');
+Route::delete('/admin/users/{id}', [AdminController::class, 'AdminDeleteUser'])->name('deleteUser');
+Route::get('/admin/create', [AdminController::class, 'AdminCreateAdmin'])->name('createAdmin');
+Route::post('/admin/create', [AdminController::class, 'AdminStoreAdmin'])->name('storeAdmin');
 
 
-Route::get('/jobs', [JobController::class, 'adminJobsIndex'])->name('jobs');
 
 //!>>>>>>>>>>>>>>>>>>>>>>>>>>Admin Job Management Routes>>>>>>>>>>>>>>>>>>>>>>>>
+Route::get('/jobs', [JobController::class, 'adminIndexJob'])->name('admin.jobs.index');
+
+
 Route::middleware(['auth', 'admin'])->group(function () {
     // Route::get('/jobs', [JobController::class, 'adminJobsIndex'])->name('jobs');
     Route::get('/admin/jobs/pending', [JobController::class, 'adminJobs'])->name('admin.jobs.pending');

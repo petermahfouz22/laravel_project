@@ -11,12 +11,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
+
 class JobController extends Controller
 {
-    /**
-     * Display a listing of the jobs.
-     */
-    public function adminJobsIndex(Request $request)
+    public function adminIndexJob(Request $request)
     {
         // Retrieve search parameters
         $search = $request->input('search');

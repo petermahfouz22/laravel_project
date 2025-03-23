@@ -76,11 +76,11 @@
                                         {{ $job->company->name ?? 'N/A' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                             {{ $job->is_approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                             {{ $job->is_approved ? 'Approved' : 'Pending' }}
                                         </span>
-                                        <span class="ml-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        <span class="ml-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                             {{ $job->is_active ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }}">
                                             {{ $job->is_active ? 'Active' : 'Inactive' }}
                                         </span>
@@ -90,8 +90,8 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
-                                            <a href="{{ route('jobs.show', $job->slug) }}" class="text-indigo-600 hover:text-indigo-900">View</a>
-                                            <a href="{{ route('jobs.edit', $job->id) }}" class="text-yellow-600 hover:text-yellow-900">Edit</a>
+                                            <a href="{{ route('admin.jobs.show', $job->slug) }}" class="text-indigo-600 hover:text-indigo-900">View</a>
+                                            <a href="{{ route('admin.jobs.edit', $job->id) }}" class="text-yellow-600 hover:text-yellow-900">Edit</a>
                                             @if(!$job->is_approved)
                                                 <form method="POST" action="{{ route('admin.jobs.approve', $job->id) }}">
                                                     @csrf
@@ -110,7 +110,7 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div class="mt-4">
                     {{ $jobs->links() }}
                 </div>
