@@ -55,7 +55,7 @@
                                     <div class="flex justify-between items-start">
                                         <div>
                                             <h4 class="text-xl font-semibold">
-                                                <a href="{{ route('candidate.jobs.show', $job) }}" class="text-blue-600 hover:underline">
+                                                <a a href="{{ route('candidate.jobs.show', ['job' => $job->id]) }}" class="text-blue-600 hover:underline">
                                                     {{ $job->title }}
                                                 </a>
                                             </h4>

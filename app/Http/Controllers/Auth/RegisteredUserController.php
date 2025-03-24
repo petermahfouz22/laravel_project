@@ -29,13 +29,18 @@ class RegisteredUserController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
-    {
-        $request->validate([
+{
+    \Log::info('Registration Request Received', $request->all());
+
+    try {
+        $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'role' => ['required', 'in:candidate,employer'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
+
+        \Log::info('Validation Passed', $validatedData);
 
         $user = User::create([
             'name' => $request->name,
@@ -44,17 +49,31 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        event(new Registered($user));
+        \Log::info('User Created', ['user_id' => $user->id, 'role' => $user->role]);
 
+        event(new Registered($user));
         Auth::login($user);
+
+        \Log::info('User Logged In', ['user_id' => $user->id]);
 
         $route = match ($user->role) {
             'candidate' => 'candidate.dashboard',
             'employer' => 'employer.dashboard',
-            'admin' => 'admin.dashboard',
             default => 'welcome',
         };
 
+        \Log::info('Redirecting to Route', ['route' => $route]);
+
         return redirect()->route($route);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        \Log::error('Validation Failed', [
+            'errors' => $e->errors(),
+            'input' => $request->all()
+        ]);
+        return redirect()->back()->withErrors($e->errors())->withInput();
+    } catch (\Exception $e) {
+        \Log::error('Unexpected Error', ['message' => $e->getMessage()]);
+        return redirect()->back()->with('error', 'Something went wrong. Please try again.');
     }
+}
 }

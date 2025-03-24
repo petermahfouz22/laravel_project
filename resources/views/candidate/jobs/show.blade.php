@@ -27,8 +27,8 @@
         </div>
 
         <div class="mt-6">
-            <a href="{{ route('candidate.applications.create', $job->id) }}" class="bg-blue-600 text-white px-6 py-3 rounded-md">Apply Now</a>
-            <a href="{{ route('candidate.jobs.save', $job->id) }}" class="ml-4 text-blue-600 hover:underline">Save Job</a>
+            <a href="{{ route('candidate.applications.create', ['job' => $job->id]) }}" class="bg-blue-600 text-white px-6 py-3 rounded-md">Apply Now</a>
+            <a href="{{ route('candidate.jobs.save', ['job' => $job->id]) }}" class="ml-4 text-blue-600 hover:underline">Save Job</a>
         </div>
     </div>
 </div>

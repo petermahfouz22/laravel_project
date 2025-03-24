@@ -37,7 +37,7 @@ class JobController extends Controller
     /** @var \App\Models\User $user */
     $user = auth()->user();
     $user->savedJobs()->attach($job->id); // Assumes a pivot table
-    return redirect()->route('candidate.jobs.show', $job)->with('status', 'Job saved!');
+    return redirect()->route('candidate.jobs.show', ['job' => $job->id])->with('status', 'Job saved!');
 }
 public function search(Request $request)
 {

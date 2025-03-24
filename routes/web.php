@@ -20,16 +20,13 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\SocialiteController;
 
-Route::get('/', function () {
-  return view('welcome');
-})->name('welcome');
+Route::get('/', [HomeController::class, 'index'])->name('welcome');
 
 // Login Routes (Unified)
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-// Role Selection for Register
 // Role Selection for Register
 Route::get('/register', function () {
   \Log::info('Reached /register route', ['url' => request()->url()]);
@@ -44,18 +41,10 @@ Route::get('/register/{role}', function ($role) {
   return view('auth.register', ['role' => $role]);
 })->name('register.form');
 
-// Display Registration Form with Selected Role
-Route::get('/register/{role}', function ($role) {
-  if (!in_array($role, ['candidate', 'employer'])) {
-      abort(404);
-  }
-  return view('auth.register', ['role' => $role]);
-})->name('register.form');
+
 
 // Registration Routes
-Route::post('/register', [RegisteredUserController::class, 'store']);
-
-
+Route::post('/register', [RegisteredUserController::class, 'store'])->name('register.store');
 // Socialite Routes (from Admin Project)
 // Socialite Routes
 
@@ -97,8 +86,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/resume/{resume}', [CandidateProfileController::class, 'deleteResume'])->name('resume.delete');
         Route::get('/jobs', [CandidateJobController::class, 'index'])->name('jobs.index');
         Route::get('/jobs/search', [CandidateJobController::class, 'search'])->name('jobs.search');
-        Route::get('/jobs/{job}', [CandidateJobController::class, 'show'])->name('jobs.show');
-        Route::post('/jobs/{job}/save', [CandidateJobController::class, 'save'])->name('jobs.save');
+        Route::get('/jobs/{job}', [CandidateJobController::class, 'show'])->name('jobs.show');        Route::post('/jobs/{job}/save', [CandidateJobController::class, 'save'])->name('jobs.save');
         Route::get('/applications', [CandidateApplicationController::class, 'index'])->name('applications.index');
         Route::get('/applications/create/{job}', [CandidateApplicationController::class, 'create'])->name('applications.create');
         Route::post('/applications/store/{job}', [CandidateApplicationController::class, 'store'])->name('applications.store');
@@ -132,4 +120,4 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
 
-require __DIR__ . '/auth.php';
+// require __DIR__ . '/auth.php';
