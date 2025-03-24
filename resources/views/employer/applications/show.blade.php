@@ -19,6 +19,9 @@
                       <a href="{{ route('employer.applications.index', $job->id) }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700">
                           &larr; {{ __('Back to Applications') }}
                       </a>
+                      <a href="{{ route('employer.dashboard') }}" class="inline-flex items-center px-4 py-2 bg-purple-800 border border-transparent rounded-md font-semibold text-xs text-blue uppercase tracking-widest hover:bg-gray-700 transition">
+                        {{ __('My Dashboard') }}
+                    </a>
                       
                       @if($application->resume_path)
                           <a href="{{ route('employer.applications.download-resume', ['job' => $job->id, 'application' => $application->id]) }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">

@@ -23,7 +23,8 @@ class TechnologySeeder extends Seeder
         
         foreach ($technologies as $tech) {
             Technology::create([
-                'name' => $tech
+                'name' => $tech,
+                'slug' => \Illuminate\Support\Str::slug($tech),
             ]);
         }
     }

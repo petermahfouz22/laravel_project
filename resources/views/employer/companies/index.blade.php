@@ -7,6 +7,9 @@
           <a href="{{ route('employer.companies.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
               {{ __('Add New Company') }}
           </a>
+          <a href="{{ route('employer.dashboard') }}" class="inline-flex items-center px-4 py-2 bg-purple-800 border border-transparent rounded-md font-semibold text-xs text-blue uppercase tracking-widest hover:bg-gray-700 transition">
+            {{ __('My Dashboard') }}
+        </a>
       </div>
   </x-slot>
 
