@@ -8,7 +8,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <h1 class="text-2xl font-bold mb-4">Edit Profile</h1>
-                    <form method="POST" action="{{ route('candidate.profile.update') }}">
+                    <form method="POST" action="{{ route('candidate.profile.index') }}">
                         @csrf
                         <div class="mb-4">
                             <label for="name" class="block text-sm font-medium text-gray-700">Name</label>

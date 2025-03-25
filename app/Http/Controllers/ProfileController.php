@@ -10,6 +10,28 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
+
+  public function show(User $user)
+    {
+        // Ensure the user is a candidate
+        if ($user->role !== 'candidate') {
+            abort(403, 'Unauthorized access');
+        }
+
+        // Optional: Add authorization check
+        // Ensure only the user themselves or an admin can view the full profile
+        if (Auth::user()->id !== $user->id && Auth::user()->role !== 'admin') {
+            abort(403, 'You are not authorized to view this profile');
+        }
+
+        // Load profile relationship if not already loaded
+        $user->load('profile');
+
+        return view('candidate.profile', [
+            'user' => $user,
+            'profile' => $user->profile
+        ]);
+    }
     /**
      * Display the user's profile form.
      */
