@@ -156,7 +156,7 @@
                       </div>
                   @endif
 
-                  <button type="submit" class="btn btn-primary">
+                  <button type="submit" class="btn text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">
                       Update Job Listing
                   </button>
               </div>

@@ -14,59 +14,87 @@ use Illuminate\Support\Facades\Auth;
 
 class JobController extends Controller
 {
-    public function adminIndexJob(Request $request)
-    {
-        // Retrieve search parameters
-        $search = $request->input('search');
-        $location = $request->input('location');
-        $category = $request->input('category');
-        $workType = $request->input('work_type');
-        $technology = $request->input('technology');
+  public function adminIndexJob(Request $request)
+{
+    // Retrieve search parameters
+    $search = $request->input('search');
+    $location = $request->input('location');
+    $category = $request->input('category');
+    $workType = $request->input('work_type');
+    $technology = $request->input('technology');
+    
+    // New parameter for job status
+    $status = $request->input('status', 'all');
 
-        // Base query for active and approved jobs
-        $query = Job::with(['company', 'category', 'technologies'])
-            ->where('is_active', true)
-            ->where('is_approved', true)
-            ->where('application_deadline', '>=', now());
+    // Base query with eager loading
+    $query = Job::with(['company', 'category', 'technologies']);
 
-        // Apply filters
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhereHas('company', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%");
-                    });
-            });
-        }
-
-        if ($location) {
-            $query->where('location', 'like', "%{$location}%");
-        }
-
-        if ($category) {
-            $query->where('category_id', $category);
-        }
-
-        if ($workType) {
-            $query->where('work_type', $workType);
-        }
-
-        if ($technology) {
-            $query->whereHas('technologies', function ($q) use ($technology) {
-                $q->where('technology_id', $technology);
-            });
-        }
-
-        // Order by creation date, most recent first
-        $jobs = $query->orderBy('created_at', 'desc')->paginate(10);
-
-        // Get all categories and technologies for filters
-        $categories = JobCategory::all();
-        $technologies = Technology::all();
-
-        return view('admin.jobs.index', compact('jobs', 'categories', 'technologies', 'search', 'location', 'category', 'workType', 'technology'));
+    // Apply status filtering
+    switch ($status) {
+        case 'pending':
+            $query->where('is_approved', false);
+            break;
+        case 'active':
+            $query->where('is_approved', true)
+                  ->where('is_active', true)
+                  ->where('application_deadline', '>=', now());
+            break;
+        case 'inactive':
+            $query->where('is_approved', true)
+                  ->where('is_active', false);
+            break;
+        default: // all jobs
+            // No additional filtering needed
     }
+
+    // Apply existing filters
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%")
+                ->orWhereHas('company', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+        });
+    }
+
+    if ($location) {
+        $query->where('location', 'like', "%{$location}%");
+    }
+
+    if ($category) {
+        $query->where('category_id', $category);
+    }
+
+    if ($workType) {
+        $query->where('work_type', $workType);
+    }
+
+    if ($technology) {
+        $query->whereHas('technologies', function ($q) use ($technology) {
+            $q->where('technology_id', $technology);
+        });
+    }
+
+    // Order by creation date, most recent first
+    $jobs = $query->orderBy('created_at', 'desc')->paginate(10);
+
+    // Get all categories and technologies for filters
+    $categories = JobCategory::all();
+    $technologies = Technology::all();
+
+    return view('admin.jobs.index', compact(
+        'jobs', 
+        'categories', 
+        'technologies', 
+        'search', 
+        'location', 
+        'category', 
+        'workType', 
+        'technology',
+        'status'
+    ));
+}
   //  ==========================================
   public function AdminUpdateUser(Request $request, $id)
 {
@@ -274,82 +302,85 @@ class JobController extends Controller
      * Only job employer or admin can update.
      */
     public function update(Request $request, string $id)
-    {
-        $job = Job::findOrFail($id);
+{
+    $job = Job::findOrFail($id);
 
-        // Verify access (job employer or admin)
-        if (auth()->id() !== $job->employer_id && !auth()->user()->isAdmin()) {
-            return redirect()->route('dashboard')
-                ->with('error', 'You don\'t have permission to update this job.');
-        }
-
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'category_id' => 'required|exists:job_categories,id',
-            'description' => 'required|string',
-            'responsibilities' => 'required|string',
-            'requirements' => 'required|string',
-            'benefits' => 'nullable|string',
-            'location' => 'required|string|max:255',
-            'work_type' => 'required|in:remote,onsite,hybrid',
-            'salary_min' => 'nullable|numeric|min:0',
-            'salary_max' => 'nullable|numeric|min:0|gte:salary_min',
-            'application_deadline' => 'required|date',
-            'is_active' => 'boolean',
-            'technologies' => 'nullable|array',
-            'technologies.*' => 'exists:technologies,id',
-        ]);
-
-        // Update job details
-        $job->title = $validated['title'];
-
-        // Only update slug if title has changed
-        if ($job->title !== $validated['title']) {
-            $slug = Str::slug($validated['title']);
-            $baseSlug = $slug;
-            $counter = 1;
-
-            // Ensure slug is unique
-            while (Job::where('slug', $slug)->where('id', '!=', $job->id)->exists()) {
-                $slug = $baseSlug . '-' . $counter++;
-            }
-
-            $job->slug = $slug;
-        }
-
-        $job->category_id = $validated['category_id'];
-        $job->description = $validated['description'];
-        $job->responsibilities = $validated['responsibilities'];
-        $job->requirements = $validated['requirements'];
-        $job->benefits = $validated['benefits'];
-        $job->location = $validated['location'];
-        $job->work_type = $validated['work_type'];
-        $job->salary_min = $validated['salary_min'];
-        $job->salary_max = $validated['salary_max'];
-        $job->application_deadline = $validated['application_deadline'];
-
-        // Only employer can toggle active status
-        if (isset($validated['is_active'])) {
-            $job->is_active = $validated['is_active'];
-        }
-
-        // Only admin can approve jobs
-        if (auth()->user()->isAdmin() && $request->has('is_approved')) {
-            $job->is_approved = $request->boolean('is_approved');
-        }
-
-        $job->save();
-
-        // Sync technologies
-        if (isset($validated['technologies'])) {
-            $job->technologies()->sync($validated['technologies']);
-        } else {
-            $job->technologies()->detach();
-        }
-
-        return redirect()->route('admin.jobs.show', $job->slug)
-            ->with('success', 'Job listing updated successfully.');
+    // Verify access (job employer or admin)
+    if (auth()->id() !== $job->employer_id && !auth()->user()->isAdmin()) {
+        return redirect()->route('dashboard')
+            ->with('error', 'You don\'t have permission to update this job.');
     }
+
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'category_id' => 'required|exists:job_categories,id',
+        'description' => 'required|string',
+        'responsibilities' => 'required|string',
+        'requirements' => 'required|string',
+        'benefits' => 'nullable|string', // Keep this as nullable
+        'location' => 'required|string|max:255',
+        'work_type' => 'required|in:remote,onsite,hybrid',
+        'salary_min' => 'nullable|numeric|min:0',
+        'salary_max' => 'nullable|numeric|min:0|gte:salary_min',
+        'application_deadline' => 'required|date',
+        'is_active' => 'boolean',
+        'technologies' => 'nullable|array',
+        'technologies.*' => 'exists:technologies,id',
+    ]);
+
+    // Update job details
+    $job->title = $validated['title'];
+
+    // Only update slug if title has changed
+    if ($job->title !== $validated['title']) {
+        $slug = Str::slug($validated['title']);
+        $baseSlug = $slug;
+        $counter = 1;
+
+        // Ensure slug is unique
+        while (Job::where('slug', $slug)->where('id', '!=', $job->id)->exists()) {
+            $slug = $baseSlug . '-' . $counter++;
+        }
+
+        $job->slug = $slug;
+    }
+
+    $job->category_id = $validated['category_id'];
+    $job->description = $validated['description'];
+    $job->responsibilities = $validated['responsibilities'];
+    $job->requirements = $validated['requirements'];
+    
+    // Use null coalescing operator to handle missing benefits
+    $job->benefits = $validated['benefits'] ?? null;
+    
+    $job->location = $validated['location'];
+    $job->work_type = $validated['work_type'];
+    $job->salary_min = $validated['salary_min'];
+    $job->salary_max = $validated['salary_max'];
+    $job->application_deadline = $validated['application_deadline'];
+
+    // Only employer can toggle active status
+    if (isset($validated['is_active'])) {
+        $job->is_active = $validated['is_active'];
+    }
+
+    // Only admin can approve jobs
+    if (auth()->user()->isAdmin() && $request->has('is_approved')) {
+        $job->is_approved = $request->boolean('is_approved');
+    }
+
+    $job->save();
+
+    // Sync technologies
+    if (isset($validated['technologies'])) {
+        $job->technologies()->sync($validated['technologies']);
+    } else {
+        $job->technologies()->detach();
+    }
+
+    return redirect()->route('admin.jobs.show', $job->slug)
+        ->with('success', 'Job listing updated successfully.');
+}
 
     /**
      * Remove the specified job from storage.

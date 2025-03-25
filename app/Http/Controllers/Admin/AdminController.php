@@ -47,10 +47,10 @@ class AdminController extends Controller
     public function AdminIndexUser()
     {
         $users = User::paginate(10);
-        $candidates = User::where('role', 'candidate')->paginate(10); // Fetch only candidates
-
-        $employers = User::where('role', 'employer')->paginate(10); // Fetch only employers
+        $candidates = User::where('role', 'candidate')->paginate(10); 
+        $employers = User::where('role', 'employer')->paginate(10);
         $admins = User::where('role', 'admin')->paginate(10);
+        
         return view('admin.users.index', compact('users', 'candidates', 'employers', 'admins'));
     }
 

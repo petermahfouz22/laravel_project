@@ -61,7 +61,159 @@
                           {{ $users->links() }}
                       </div>
                   </div>
-                  <!-- Repeat for candidates, employers, admins tabs -->
+                  <div id="userTabsContent" class="mt-4">
+                    <!-- All Users Tab (existing code) -->
+                    <div class="tab-content hidden" id="allUsers">
+                        <!-- Existing all users table -->
+                    </div>
+                
+                    <!-- Candidates Tab -->
+                    <div class="tab-content hidden" id="candidates">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full border border-gray-200">
+                                <thead class="bg-gray-800 text-white">
+                                    <tr>
+                                        <th class="px-4 py-2 border border-gray-300">Image</th>
+                                        <th class="px-4 py-2 border border-gray-300">Name</th>
+                                        <th class="px-4 py-2 border border-gray-300">Email</th>
+                                        <th class="px-4 py-2 border border-gray-300">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($candidates as $user)
+                                        <tr class="hover:bg-gray-100">
+                                            <td class="px-4 py-2 text-center">
+                                                <img src="{{ $user->profile_image ? asset('storage/' . $user->profile_image) : asset('default-avatar.png') }}" alt="User Image" class="w-12 h-12 rounded-full mx-auto">
+                                            </td>
+                                            <td class="px-4 py-2 text-center">{{ $user->name }}</td>
+                                            <td class="px-4 py-2 text-center">{{ $user->email }}</td>
+                                            <td class="px-4 py-2 text-center">
+                                                <a href="{{ route('admin.users.show', $user->id) }}" class="text-white mr-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                                <a href="{{ route('admin.users.edit', $user->id) }}" class="text-white mr-2 bg-green-600 hover:bg-green-700 font-medium rounded-lg px-4 py-2 transition shadow-md inline-block">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                                <form id="delete-form-{{ $user->id }}" action="{{ route('admin.users.delete', $user->id) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button" onclick="confirmDelete({{ $user->id }})" class="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg px-4 py-2 transition shadow-md">
+                                                        <i class="fas fa-trash"></i> Delete
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="px-4 py-6 text-center text-gray-500">No candidates found</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4">
+                            {{ $candidates->links() }}
+                        </div>
+                    </div>
+                
+                    <!-- Employers Tab -->
+                    <div class="tab-content hidden" id="employers">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full border border-gray-200">
+                                <thead class="bg-gray-800 text-white">
+                                    <tr>
+                                        <th class="px-4 py-2 border border-gray-300">Image</th>
+                                        <th class="px-4 py-2 border border-gray-300">Name</th>
+                                        <th class="px-4 py-2 border border-gray-300">Email</th>
+                                        <th class="px-4 py-2 border border-gray-300">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($employers as $user)
+                                        <tr class="hover:bg-gray-100">
+                                            <td class="px-4 py-2 text-center">
+                                                <img src="{{ $user->profile_image ? asset('storage/' . $user->profile_image) : asset('default-avatar.png') }}" alt="User Image" class="w-12 h-12 rounded-full mx-auto">
+                                            </td>
+                                            <td class="px-4 py-2 text-center">{{ $user->name }}</td>
+                                            <td class="px-4 py-2 text-center">{{ $user->email }}</td>
+                                            <td class="px-4 py-2 text-center">
+                                                <a href="{{ route('admin.users.show', $user->id) }}" class="text-white mr-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                                <a href="{{ route('admin.users.edit', $user->id) }}" class="text-white mr-2 bg-green-600 hover:bg-green-700 font-medium rounded-lg px-4 py-2 transition shadow-md inline-block">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                                <form id="delete-form-{{ $user->id }}" action="{{ route('admin.users.delete', $user->id) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button" onclick="confirmDelete({{ $user->id }})" class="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg px-4 py-2 transition shadow-md">
+                                                        <i class="fas fa-trash"></i> Delete
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="px-4 py-6 text-center text-gray-500">No employers found</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4">
+                            {{ $employers->links() }}
+                        </div>
+                    </div>
+                
+                    <!-- Admins Tab -->
+                    <div class="tab-content hidden" id="admins">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full border border-gray-200">
+                                <thead class="bg-gray-800 text-white">
+                                    <tr>
+                                        <th class="px-4 py-2 border border-gray-300">Image</th>
+                                        <th class="px-4 py-2 border border-gray-300">Name</th>
+                                        <th class="px-4 py-2 border border-gray-300">Email</th>
+                                        <th class="px-4 py-2 border border-gray-300">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($admins as $user)
+                                        <tr class="hover:bg-gray-100">
+                                            <td class="px-4 py-2 text-center">
+                                                <img src="{{ $user->profile_image ? asset('storage/' . $user->profile_image) : asset('default-avatar.png') }}" alt="User Image" class="w-12 h-12 rounded-full mx-auto">
+                                            </td>
+                                            <td class="px-4 py-2 text-center">{{ $user->name }}</td>
+                                            <td class="px-4 py-2 text-center">{{ $user->email }}</td>
+                                            <td class="px-4 py-2 text-center">
+                                                <a href="{{ route('admin.users.show', $user->id) }}" class="text-white mr-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                                <a href="{{ route('admin.users.edit', $user->id) }}" class="text-white mr-2 bg-green-600 hover:bg-green-700 font-medium rounded-lg px-4 py-2 transition shadow-md inline-block">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                                <form id="delete-form-{{ $user->id }}" action="{{ route('admin.users.delete', $user->id) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button" onclick="confirmDelete({{ $user->id }})" class="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg px-4 py-2 transition shadow-md">
+                                                        <i class="fas fa-trash"></i> Delete
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="px-4 py-6 text-center text-gray-500">No admins found</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4">
+                            {{ $admins->links() }}
+                        </div>
+                    </div>
+                </div>
               </div>
           </div>
       </div>

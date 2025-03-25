@@ -18,7 +18,7 @@
                   <p class="text-gray-600 mt-2">{{ $job->description }}</p>
                   <div class="mt-4 flex justify-between items-center">
                       <span class="text-gray-500">{{ $job->created_at->diffForHumans() }}</span>
-                      <a href="{{ route('candidate.jobs.show', ['job' => $job->id]) }}" class="text-blue-600 hover:underline">View Job</a>
+                      <a href="{{ route('jobs.show', ['job' => $job->id]) }}" class="text-blue-600 hover:underline">View Job</a>
                   </div>
               </div>
           @endforeach

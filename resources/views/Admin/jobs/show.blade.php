@@ -65,7 +65,7 @@
                               <td class="py-2 font-medium">Status</td>
                               <td class="py-2">
                                   @if(!$job->is_approved)
-                                      <span class="badge badge-warning">Pending Approval</span>
+                                      <span class="badge badge-warning" >Pending Approval</span>
                                   @elseif(!$job->is_active)
                                       <span class="badge badge-error">Inactive</span>
                                   @else
@@ -91,8 +91,14 @@
                               <h5 class="font-medium mb-2">Requirements</h5>
                               <p class="text-gray-700">{{ $job->requirements }}</p>
                           </div>
+                          {{-- <div>
+                            <h5 class="font-medium mb-2">benefits</h5>
+                            <p class="text-gray-700">{{ $job->benefits }}</p>
+                        </div> --}}
                       </div>
                   </div>
+
+                  
               </div>
           </div>
       </div>

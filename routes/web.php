@@ -72,7 +72,6 @@ Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function
   });
 
   // Job Management
-  Route::controller(JobController::class)->group(function () {
     Route::controller(JobController::class)->group(function () {
       // Job Listing Routes
       Route::get('/jobs', 'adminIndexJob')->name('jobs.index');
@@ -86,53 +85,58 @@ Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function
       // Job Approval and Deletion Routes
       Route::post('/jobs/{id}/approve', 'approve')->name('jobs.approve');
       Route::delete('/jobs/{id}', 'destroy')->name('jobs.destroy');
+    
   });
-  });
+
+
+
+});
+
+
+Route::get('/jobs/{job}', [CandidateJobController::class, 'show'])->name('jobs.show');
+Route::get('/jobs', [CandidateJobController::class, 'index'])->name('jobs.index');
 
 
     // Candidate Routes
     Route::middleware('role:candidate')->prefix('candidate')->name('candidate.')->group(function () {
-        Route::get('/dashboard', [CandidateDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/profile', [CandidateProfileController::class, 'index'])->name('profile.index');
-        Route::get('/profile/edit', [CandidateProfileController::class, 'edit'])->name('profile.edit');
-        Route::post('/profile', [CandidateProfileController::class, 'update'])->name('profile.update');
-        Route::get('/profile/resumes', [CandidateProfileController::class, 'resumes'])->name('profile.resumes');
-        Route::post('/resume', [CandidateProfileController::class, 'storeResume'])->name('resume.store');
-        Route::delete('/resume/{resume}', [CandidateProfileController::class, 'deleteResume'])->name('resume.delete');
-        Route::get('/jobs', [CandidateJobController::class, 'index'])->name('jobs.index');
-        Route::get('/jobs/search', [CandidateJobController::class, 'search'])->name('jobs.search');
-        Route::get('/jobs/{job}', [CandidateJobController::class, 'show'])->name('jobs.show');        Route::post('/jobs/{job}/save', [CandidateJobController::class, 'save'])->name('jobs.save');
-        Route::get('/applications', [CandidateApplicationController::class, 'index'])->name('applications.index');
-        Route::get('/applications/create/{job}', [CandidateApplicationController::class, 'create'])->name('applications.create');
-        Route::post('/applications/store/{job}', [CandidateApplicationController::class, 'store'])->name('applications.store');
-        Route::get('/messages', [CandidateMessageController::class, 'index'])->name('messages.index');
-        Route::post('/messages', [CandidateMessageController::class, 'store'])->name('messages.store');
-    });
+      Route::get('/dashboard', [CandidateDashboardController::class, 'index'])->name('dashboard');
+      Route::get('/profile', [CandidateProfileController::class, 'index'])->name('profile.index');
+      Route::get('/profile/edit', [CandidateProfileController::class, 'edit'])->name('profile.edit');
+      Route::post('/profile', [CandidateProfileController::class, 'update'])->name('profile.update');
+      Route::get('/profile/resumes', [CandidateProfileController::class, 'resumes'])->name('profile.resumes');
+      Route::post('/resume', [CandidateProfileController::class, 'storeResume'])->name('resume.store');
+      Route::delete('/resume/{resume}', [CandidateProfileController::class, 'deleteResume'])->name('resume.delete');
+      Route::get('/jobs/search', [CandidateJobController::class, 'search'])->name('jobs.search');
+      Route::post('/jobs/{job}/save', [CandidateJobController::class, 'save'])->name('jobs.save');
+      Route::get('/applications', [CandidateApplicationController::class, 'index'])->name('applications.index');
+      Route::get('/applications/create/{job}', [CandidateApplicationController::class, 'create'])->name('applications.create');
+      Route::post('/applications/store/{job}', [CandidateApplicationController::class, 'store'])->name('applications.store');
+      Route::get('/messages', [CandidateMessageController::class, 'index'])->name('messages.index');
+      Route::post('/messages', [CandidateMessageController::class, 'store'])->name('messages.store');
+  });
 
-    // Employer Routes
-    Route::middleware('role:employer')->prefix('employer')->name('employer.')->group(function () {
-        Route::get('/dashboard', [EmployerDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::resource('companies', CompanyProfileController::class);
-        Route::resource('jobs', EmployerJobController::class);
-        Route::put('/jobs/{job}/toggle-active', [EmployerJobController::class, 'toggleActive'])->name('jobs.toggle-active');
-        Route::get('/jobs/{job}/applications', [ApplicantController::class, 'index'])->name('applications.index');
-        Route::get('/jobs/{job}/applications/{application}', [ApplicantController::class, 'show'])->name('applications.show');
-        Route::put('/jobs/{job}/applications/{application}/status', [ApplicantController::class, 'updateStatus'])->name('applications.update-status');
-        Route::get('/jobs/{job}/applications/{application}/download-resume', [ApplicantController::class, 'downloadResume'])->name('applications.download-resume');
-        Route::resource('interviews', InterviewController::class)->except(['create', 'store']);
-        Route::get('/jobs/{job}/applications/{application}/interviews/create', [InterviewController::class, 'create'])->name('interviews.create');
-        Route::post('/jobs/{job}/applications/{application}/interviews', [InterviewController::class, 'store'])->name('interviews.store');
-        Route::put('/interviews/{interview}/complete', [InterviewController::class, 'markCompleted'])->name('interviews.complete');
-    });
+  // Employer Routes
+  Route::middleware('role:employer')->prefix('employer')->name('employer.')->group(function () {
+      Route::get('/dashboard', [EmployerDashboardController::class, 'index'])->name('dashboard');
+      Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+      Route::resource('companies', CompanyProfileController::class);
+      Route::resource('jobs', EmployerJobController::class);
+      Route::put('/jobs/{job}/toggle-active', [EmployerJobController::class, 'toggleActive'])->name('jobs.toggle-active');
+      Route::get('/jobs/{job}/applications', [ApplicantController::class, 'index'])->name('applications.index');
+      Route::get('/jobs/{job}/applications/{application}', [ApplicantController::class, 'show'])->name('applications.show');
+      Route::put('/jobs/{job}/applications/{application}/status', [ApplicantController::class, 'updateStatus'])->name('applications.update-status');
+      Route::get('/jobs/{job}/applications/{application}/download-resume', [ApplicantController::class, 'downloadResume'])->name('applications.download-resume');
+      Route::resource('interviews', InterviewController::class)->except(['create', 'store']);
+      Route::get('/jobs/{job}/applications/{application}/interviews/create', [InterviewController::class, 'create'])->name('interviews.create');
+      Route::post('/jobs/{job}/applications/{application}/interviews', [InterviewController::class, 'store'])->name('interviews.store');
+      Route::put('/interviews/{interview}/complete', [InterviewController::class, 'markCompleted'])->name('interviews.complete');
+  });
 
-    // Profile Routes (shared across roles)
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+  // Profile Routes (shared across roles)
+  Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+  Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+  Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Logout
-    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-});
+  // Logout
+  Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-// require __DIR__ . '/auth.php';
