@@ -52,6 +52,48 @@ class AdminController extends Controller
         $admins = User::where('role', 'admin')->paginate(10);
         return view('admin.users.index', compact('users', 'candidates', 'employers', 'admins'));
     }
+
+    public function dashboard()
+    {
+        $user = auth()->user();
+        if ($user->isAdmin()) {
+            return $this->adminDashboard();
+        } elseif ($user->isEmployer()) {
+            return $this->employerDashboard();
+        } else {
+            return $this->candidateDashboard();
+        }
+    }
+
+    private function adminDashboard()
+    {
+        $totalUsers = User::count();
+        $totalJobs = \App\Models\Job::count();
+        $pendingJobs = \App\Models\Job::where('is_approved', false)->count();
+        $totalEmployers = User::where('role', 'employer')->count();
+        return view('admin.dashboard', compact('totalUsers', 'totalJobs', 'pendingJobs'));
+    }
+    //!>>>>>>>>>>>>>>>>>>>>>>>>>>employerDashboard>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    private function employerDashboard()
+    {
+        $user = auth()->user();
+        $jobs = $user->postedJobs()->latest()->paginate(5);
+        $totalApplications = \App\Models\Application::whereIn('job_id', $user->postedJobs()->pluck('id'))->count();
+
+        return view('employer.dashboard', compact('jobs', 'totalApplications'));
+    }
+    //!>>>>>>>>>>>>>>>>>>>>>>>>>>candidateDashboard>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    private function candidateDashboard()
+    {
+        $user = auth()->user();
+        $applications = $user->applications()->with('job')->latest()->paginate(5);
+        $savedJobs = $user->savedJobs ?? collect();
+
+        return view('candidate.dashboard', compact('applications', 'savedJobs'));
+    }
+
+//!>>>>>
     //!>>>>>>>>>>>>>>>>>>>>>>>>>>>Show User>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     public function AdminShowUser($id)
     {
@@ -68,15 +110,64 @@ class AdminController extends Controller
     public function AdminUpdateUser(Request $request, $id)
     {
         $user = User::findOrFail($id);
-
+    
+        // Validate common fields
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'role' => 'required|in:candidate,employer,admin'
         ]);
-
-        $user->update($validated);
-
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully');
+    
+        // Update common user details
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+    
+        // If role is changing, handle role-specific logic
+        if ($user->role !== $request->input('role')) {
+            // You might want to add more complex role transition logic here
+            $user->role = $request->input('role');
+        }
+    
+        // Role-specific updates
+        switch ($request->input('role')) {
+            case 'admin':
+                $request->validate([
+                    'admin_level' => 'required|in:super_admin,content_admin,user_admin'
+                ]);
+                $user->admin_level = $request->input('admin_level');
+                break;
+    
+            case 'employer':
+                $request->validate([
+                    'company_name' => 'nullable|string|max:255'
+                ]);
+                
+                // Update or create company profile
+                $company = $user->company ?? new \App\Models\Company();
+                $company->name = $request->input('company_name');
+                $company->user_id = $user->id;
+                $company->save();
+                break;
+    
+            case 'candidate':
+                $request->validate([
+                    'skills' => 'nullable|string',
+                    'job_preferences' => 'nullable|string'
+                ]);
+                
+                // Update or create candidate profile
+                $candidate = $user->candidate ?? new \App\Models\Candidate();
+                $candidate->skills = $request->input('skills');
+                $candidate->job_preferences = $request->input('job_preferences');
+                $candidate->user_id = $user->id;
+                $candidate->save();
+                break;
+        }
+    
+        $user->save();
+    
+        return redirect()->route('admin.users.index')
+            ->with('success', 'User updated successfully');
     }
     //!>>>>>>>>>>>>>>>>>>>>>>>>>>Delete User>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     public function AdminDeleteUser($id)

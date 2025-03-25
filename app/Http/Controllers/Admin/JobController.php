@@ -67,7 +67,60 @@ class JobController extends Controller
 
         return view('admin.jobs.index', compact('jobs', 'categories', 'technologies', 'search', 'location', 'category', 'workType', 'technology'));
     }
+  //  ==========================================
+  public function AdminUpdateUser(Request $request, $id)
+{
+    $user = User::findOrFail($id);
 
+    // Common validation for all users
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . $user->id,
+    ]);
+
+    // Role-specific validation and updates
+    switch ($user->role) {
+        case 'admin':
+            $request->validate([
+                'admin_level' => 'required|in:super_admin,content_admin,user_admin'
+            ]);
+            // Update admin-specific details
+            $user->admin_level = $request->input('admin_level');
+            break;
+
+        case 'employer':
+            $request->validate([
+                'company_name' => 'nullable|string|max:255'
+            ]);
+            // Update or create company profile
+            $company = $user->company ?? new Company();
+            $company->name = $request->input('company_name');
+            $company->user_id = $user->id;
+            $company->save();
+            break;
+
+        case 'candidate':
+            $request->validate([
+                'skills' => 'nullable|string',
+                'job_preferences' => 'nullable|string'
+            ]);
+            // Update or create candidate profile
+            $candidate = $user->candidate ?? new Candidate();
+            $candidate->skills = $request->input('skills');
+            $candidate->job_preferences = $request->input('job_preferences');
+            $candidate->user_id = $user->id;
+            $candidate->save();
+            break;
+    }
+
+    // Update common user details
+    $user->name = $validated['name'];
+    $user->email = $validated['email'];
+    $user->save();
+
+    return redirect()->route('admin.users.show', $user->id)
+        ->with('success', 'User profile updated successfully.');
+}
     /**
      * Show the form for creating a new job.
      * Employer only access.
@@ -89,7 +142,7 @@ class JobController extends Controller
         $categories = JobCategory::all();
         $technologies = Technology::all();
 
-        return view('jobs.create', compact('categories', 'technologies'));
+        return view('admin.jobs.create', compact('categories', 'technologies'));
     }
 
     /**
@@ -161,7 +214,7 @@ class JobController extends Controller
             $job->technologies()->attach($validated['technologies']);
         }
 
-        return redirect()->route('jobs.show', $job->slug)
+        return redirect()->route('admin.jobs.show', $job->slug)
             ->with('success', 'Job listing created successfully. It will be visible after admin approval.');
     }
 
@@ -169,47 +222,32 @@ class JobController extends Controller
      * Display the specified job.
      */
     public function show(string $slug)
-    {
-        $job = Job::where('slug', $slug)
-            ->with(['company', 'category', 'technologies', 'employer'])
-            ->firstOrFail();
+{
+    $job = Job::where('slug', $slug)
+        ->with(['company', 'category', 'technologies', 'employer'])
+        ->firstOrFail();
 
-        // Check if job is inactive or unapproved - only employer and admin can see
+    // Check if the user is an admin
+    if (!auth()->user()->isAdmin()) {
+        // If not an admin, apply the previous visibility checks
         if (
             (!$job->is_active || !$job->is_approved) &&
             (!auth()->check() ||
                 (auth()->id() !== $job->employer_id && !auth()->user()->isAdmin()))
         ) {
-
-            return redirect()->route('jobs.index')
+            return redirect()->route('admin.jobs.index')
                 ->with('error', 'This job listing is not available.');
         }
-
-        // Increment view count
-        if (!session()->has("job_viewed_{$job->id}")) {
-            $job->increment('views_count');
-            session(["job_viewed_{$job->id}" => true]);
-        }
-
-        // Check if user has already applied
-        $hasApplied = false;
-        if (auth()->check() && auth()->user()->isCandidate()) {
-            $hasApplied = Application::where('job_id', $job->id)
-                ->where('candidate_id', auth()->id())
-                ->exists();
-        }
-
-        // Get similar jobs
-        $similarJobs = Job::where('category_id', $job->category_id)
-            ->where('id', '!=', $job->id)
-            ->where('is_active', true)
-            ->where('is_approved', true)
-            ->where('application_deadline', '>=', now())
-            ->limit(3)
-            ->get();
-
-        return view('jobs.show', compact('job', 'hasApplied', 'similarJobs'));
     }
+
+    // Increment view count (only if not already viewed in this session)
+    if (!session()->has("job_viewed_{$job->id}")) {
+        $job->increment('views_count');
+        session(["job_viewed_{$job->id}" => true]);
+    }
+
+    return view('admin.jobs.show', compact('job'));
+}
 
     /**
      * Show the form for editing the specified job.
@@ -228,7 +266,7 @@ class JobController extends Controller
         $categories = JobCategory::all();
         $technologies = Technology::all();
 
-        return view('jobs.edit', compact('job', 'categories', 'technologies'));
+        return view('admin.jobs.edit', compact('job', 'categories', 'technologies'));
     }
 
     /**
@@ -309,7 +347,7 @@ class JobController extends Controller
             $job->technologies()->detach();
         }
 
-        return redirect()->route('jobs.show', $job->slug)
+        return redirect()->route('admin.jobs.show', $job->slug)
             ->with('success', 'Job listing updated successfully.');
     }
 
@@ -317,21 +355,21 @@ class JobController extends Controller
      * Remove the specified job from storage.
      * Only job employer or admin can delete.
      */
-    public function destroy(string $id)
-    {
-        $job = Job::findOrFail($id);
+    // public function destroy(string $id)
+    // {
+    //     $job = Job::findOrFail($id);
 
-        // Verify access (job employer or admin)
-        if (auth()->id() !== $job->employer_id && !auth()->user()->isAdmin()) {
-            return redirect()->route('dashboard')
-                ->with('error', 'You don\'t have permission to delete this job.');
-        }
+    //     // Verify access (job employer or admin)
+    //     if (auth()->id() !== $job->employer_id && !auth()->user()->isAdmin()) {
+    //         return redirect()->route('dashboard')
+    //             ->with('error', 'You don\'t have permission to delete this job.');
+    //     }
 
-        $job->delete();
+    //     $job->delete();
 
-        return redirect()->route('dashboard')
-            ->with('success', 'Job listing deleted successfully.');
-    }
+    //     return redirect()->route('dashboard')
+    //         ->with('success', 'Job listing deleted successfully.');
+    // }
 
     /**
      * Display jobs dashboard for employers.
@@ -367,41 +405,94 @@ class JobController extends Controller
      * Admin job approval dashboard.
      * Admin only access.
      */
+    // public function adminJobs()
+    // {
+    //     // Verify admin access
+    //     if (!auth()->user()->isAdmin()) {
+    //         return redirect()->route('dashboard')
+    //             ->with('error', 'You do not have permission to access this page.');
+    //     }
+
+    //     $pendingJobs = Job::where('is_approved', false)
+    //         ->with(['company', 'employer'])
+    //         ->latest()
+    //         ->paginate(10);
+
+    //     return view('admin.jobs.pending', compact('pendingJobs'));
+    // }
     public function adminJobs()
-    {
-        // Verify admin access
-        if (!auth()->user()->isAdmin()) {
-            return redirect()->route('dashboard')
-                ->with('error', 'You do not have permission to access this page.');
-        }
+                 {
+                 // Verify admin access
+                 if (!auth()->user()->isAdmin()) {
+                 return redirect()->route('dashboard')
+                 ->with('error', 'You do not have permission to access this page.');
+                 }
+                    $pendingJobs = Job::where('is_approved', false)
+                         ->with(['company', 'employer', 'category'])
+                         ->latest()
+                         ->paginate(10);
+                 
+                     return view('admin.jobs.pending', compact('pendingJobs'));
+                 }
 
-        $pendingJobs = Job::where('is_approved', false)
-            ->with(['company', 'employer'])
-            ->latest()
-            ->paginate(10);
-
-        return view('admin.jobs.pending', compact('pendingJobs'));
+/**
+ * Approve a job listing.
+ * Admin only access.
+ */
+public function approve(string $id)
+{
+    // Verify admin access
+    if (!auth()->user()->isAdmin()) {
+        return redirect()->route('dashboard')
+            ->with('error', 'You do not have permission to approve job listings.');
     }
+
+    $job = Job::findOrFail($id);
+    $job->is_approved = true;
+    $job->save();
+
+    return redirect()->route('admin.jobs.pending')
+        ->with('success', 'Job listing approved successfully.');
+}
+
+/**
+ * Reject (delete) a job listing.
+ * Admin only access.
+ */
+public function destroy(string $id)
+{
+    // Verify admin access
+    if (!auth()->user()->isAdmin()) {
+        return redirect()->route('dashboard')
+            ->with('error', 'You do not have permission to delete job listings.');
+    }
+
+    $job = Job::findOrFail($id);
+    $job->delete();
+
+    return redirect()->route('admin.jobs.pending')
+        ->with('success', 'Job listing rejected successfully.');
+}
 
     /**
      * Approve a job listing.
      * Admin only access.
      */
-    public function approve(string $id)
-    {
-        // Verify admin access
-        if (!auth()->user()->isAdmin()) {
-            return redirect()->route('dashboard')
-                ->with('error', 'You do not have permission to approve job listings.');
-        }
+    // public function approve(string $id)
+    // {
+    //     // Verify admin access
+    //     if (!auth()->user()->isAdmin()) {
+    //         return redirect()->route('dashboard')
+    //             ->with('error', 'You do not have permission to approve job listings.');
+    //     }
 
-        $job = Job::findOrFail($id);
-        $job->is_approved = true;
-        $job->save();
+    //     $job = Job::findOrFail($id);
+    //     $job->is_approved = true;
+    //     $job->save();
 
-        return redirect()->back()
-            ->with('success', 'Job listing approved successfully.');
-    }
+    //     return redirect()->back()
+    //         ->with('success', 'Job listing approved successfully.');
+    // }
 
     /**
      * Save a job to user's favorites.
@@ -440,4 +531,5 @@ class JobController extends Controller
         return redirect()->back()
             ->with('success', 'Job removed from your favorites.');
     }
+  
 }

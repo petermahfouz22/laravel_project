@@ -16,6 +16,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\JobController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\SocialiteController;
@@ -55,25 +56,39 @@ Route::post('/socialite/role-selection', [SocialiteController::class, 'storeRole
 
 
 
-Route::middleware('auth')->group(function () {
-    // Admin Routes
-    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+  // Dashboard
+  Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-        // User Management
-        Route::get('/users', [AdminController::class, 'AdminIndexUser'])->name('users.index');
-        Route::get('/users/show/{id}', [AdminController::class, 'AdminShowUser'])->name('users.show');
-        Route::get('/users/{id}/edit', [AdminController::class, 'AdminEditUser'])->name('users.edit');
-        Route::put('/users/{id}/update', [AdminController::class, 'AdminUpdateUser'])->name('users.update');
-        Route::delete('/users/{id}', [AdminController::class, 'AdminDeleteUser'])->name('users.delete');
-        Route::get('/create', [AdminController::class, 'AdminCreateAdmin'])->name('users.create');
-        Route::post('/create', [AdminController::class, 'AdminStoreAdmin'])->name('users.store');
+  // User Management
+  Route::controller(AdminController::class)->group(function () {
+      Route::get('/users', 'AdminIndexUser')->name('users.index');
+      Route::get('/users/show/{id}', 'AdminShowUser')->name('users.show');
+      Route::get('/users/{id}/edit', 'AdminEditUser')->name('users.edit');
+      Route::put('/users/{id}/update', 'AdminUpdateUser')->name('users.update');
+      Route::delete('/users/{id}', 'AdminDeleteUser')->name('users.delete');
+      Route::get('/create', 'AdminCreateAdmin')->name('users.create');
+      Route::post('/create', 'AdminStoreAdmin')->name('users.store');
+  });
 
-        // Job Management
-        Route::get('/jobs', [JobController::class, 'adminIndexJob'])->name('jobs.index');
-        Route::get('/jobs/pending', [JobController::class, 'adminJobs'])->name('jobs.pending');
-        Route::post('/jobs/{id}/approve', [JobController::class, 'approve'])->name('jobs.approve');
-    });
+  // Job Management
+  Route::controller(JobController::class)->group(function () {
+    Route::controller(JobController::class)->group(function () {
+      // Job Listing Routes
+      Route::get('/jobs', 'adminIndexJob')->name('jobs.index');
+      Route::get('/jobs/pending', 'adminJobs')->name('jobs.pending');
+      
+      // Individual Job Routes
+      Route::get('/jobs/{slug}', 'show')->name('jobs.show');
+      Route::get('/jobs/{id}/edit', 'edit')->name('jobs.edit');
+      Route::put('/jobs/{id}', 'update')->name('jobs.update');
+      
+      // Job Approval and Deletion Routes
+      Route::post('/jobs/{id}/approve', 'approve')->name('jobs.approve');
+      Route::delete('/jobs/{id}', 'destroy')->name('jobs.destroy');
+  });
+  });
+
 
     // Candidate Routes
     Route::middleware('role:candidate')->prefix('candidate')->name('candidate.')->group(function () {
