@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
@@ -108,67 +109,79 @@ class AdminController extends Controller
     }
 
     public function AdminUpdateUser(Request $request, $id)
-    {
-        $user = User::findOrFail($id);
-    
-        // Validate common fields
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'role' => 'required|in:candidate,employer,admin'
-        ]);
-    
-        // Update common user details
-        $user->name = $validated['name'];
-        $user->email = $validated['email'];
-    
-        // If role is changing, handle role-specific logic
-        if ($user->role !== $request->input('role')) {
-            // You might want to add more complex role transition logic here
-            $user->role = $request->input('role');
+{
+    $user = User::findOrFail($id);
+
+    // Validate common fields
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+        'role' => 'required|in:candidate,employer,admin',
+        'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' // Add profile image validation
+    ]);
+
+    // Update common user details
+    $user->name = $validated['name'];
+    $user->email = $validated['email'];
+
+    // Handle profile image upload
+    if ($request->hasFile('profile_image')) {
+        // Delete old profile image if exists
+        if ($user->profile_image) {
+            Storage::disk('public')->delete($user->profile_image);
         }
-    
-        // Role-specific updates
-        switch ($request->input('role')) {
-            case 'admin':
-                $request->validate([
-                    'admin_level' => 'required|in:super_admin,content_admin,user_admin'
-                ]);
-                $user->admin_level = $request->input('admin_level');
-                break;
-    
-            case 'employer':
-                $request->validate([
-                    'company_name' => 'nullable|string|max:255'
-                ]);
-                
-                // Update or create company profile
-                $company = $user->company ?? new \App\Models\Company();
-                $company->name = $request->input('company_name');
-                $company->user_id = $user->id;
-                $company->save();
-                break;
-    
-            case 'candidate':
-                $request->validate([
-                    'skills' => 'nullable|string',
-                    'job_preferences' => 'nullable|string'
-                ]);
-                
-                // Update or create candidate profile
-                $candidate = $user->candidate ?? new \App\Models\Candidate();
-                $candidate->skills = $request->input('skills');
-                $candidate->job_preferences = $request->input('job_preferences');
-                $candidate->user_id = $user->id;
-                $candidate->save();
-                break;
-        }
-    
-        $user->save();
-    
-        return redirect()->route('admin.users.index')
-            ->with('success', 'User updated successfully');
+
+        // Store new profile image
+        $imagePath = $request->file('profile_image')->store('profile_images', 'public');
+        $user->profile_image = $imagePath;
     }
+
+    // If role is changing, handle role-specific logic
+    if ($user->role !== $request->input('role')) {
+        $user->role = $request->input('role');
+    }
+
+    // Role-specific updates
+    switch ($request->input('role')) {
+        case 'admin':
+            $request->validate([
+                'admin_level' => 'required|in:super_admin,content_admin,user_admin'
+            ]);
+            $user->admin_level = $request->input('admin_level');
+            break;
+
+        case 'employer':
+            $request->validate([
+                'company_name' => 'nullable|string|max:255'
+            ]);
+            
+            // Update or create company profile
+            $company = $user->company ?? new \App\Models\Company();
+            $company->name = $request->input('company_name');
+            $company->user_id = $user->id;
+            $company->save();
+            break;
+
+        case 'candidate':
+            $request->validate([
+                'skills' => 'nullable|string',
+                'job_preferences' => 'nullable|string'
+            ]);
+            
+            // Update or create candidate profile
+            $candidate = $user->candidate ?? new \App\Models\Candidate();
+            $candidate->skills = $request->input('skills');
+            $candidate->job_preferences = $request->input('job_preferences');
+            $candidate->user_id = $user->id;
+            $candidate->save();
+            break;
+    }
+
+    $user->save();
+
+    return redirect()->route('admin.users.index')
+        ->with('success', 'User updated successfully');
+}
     //!>>>>>>>>>>>>>>>>>>>>>>>>>>Delete User>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     public function AdminDeleteUser($id)
     {

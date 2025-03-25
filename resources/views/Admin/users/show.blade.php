@@ -44,20 +44,94 @@
               </div>
           </div>
       </div>
+
       @if($user->role == 'candidate')
           <div class="mt-4 border-t pt-4">
               <h3 class="font-semibold text-lg mb-2">Candidate Information</h3>
-              <!-- Add candidate specific fields -->
+              @php
+                  $candidate = $user->candidate ?? null;
+              @endphp
+              @if($candidate)
+                  <div class="space-y-3">
+                      <div>
+                          <p class="text-gray-600 text-sm">Skills</p>
+                          <p class="font-medium">{{ $candidate->skills ?? 'Not specified' }}</p>
+                      </div>
+                      <div>
+                          <p class="text-gray-600 text-sm">Job Preferences</p>
+                          <p class="font-medium">{{ $candidate->job_preferences ?? 'Not specified' }}</p>
+                      </div>
+                      <div>
+                          <p class="text-gray-600 text-sm">Total Applications</p>
+                          <p class="font-medium">{{ $user->applications()->count() }}</p>
+                      </div>
+                      <div>
+                          <p class="text-gray-600 text-sm">Saved Jobs</p>
+                          <p class="font-medium">{{ $user->savedJobs()->count() }}</p>
+                      </div>
+                  </div>
+              @else
+                  <p class="text-gray-500">No additional candidate information available.</p>
+              @endif
           </div>
       @elseif($user->role == 'employer')
           <div class="mt-4 border-t pt-4">
               <h3 class="font-semibold text-lg mb-2">Employer Information</h3>
-              <!-- Add employer specific fields -->
+              @php
+                  $company = $user->company ?? null;
+              @endphp
+              @if($company)
+                  <div class="space-y-3">
+                      <div>
+                          <p class="text-gray-600 text-sm">Company Name</p>
+                          <p class="font-medium">{{ $company->name }}</p>
+                      </div>
+                      <div>
+                          <p class="text-gray-600 text-sm">Total Jobs Posted</p>
+                          <p class="font-medium">{{ $user->postedJobs()->count() }}</p>
+                      </div>
+                      <div>
+                          <p class="text-gray-600 text-sm">Active Jobs</p>
+                          <p class="font-medium">{{ $user->postedJobs()->where('is_active', true)->count() }}</p>
+                      </div>
+                      <div>
+                          <p class="text-gray-600 text-sm">Total Applications Received</p>
+                          <p class="font-medium">{{ \App\Models\Application::whereIn('job_id', $user->postedJobs()->pluck('id'))->count() }}</p>
+                      </div>
+                  </div>
+              @else
+                  <p class="text-gray-500">No company information available.</p>
+              @endif
           </div>
       @elseif($user->role == 'admin')
           <div class="mt-4 border-t pt-4">
               <h3 class="font-semibold text-lg mb-2">Admin Information</h3>
-              <!-- Add admin specific fields -->
+              <div class="space-y-3">
+                  <div>
+                      <p class="text-gray-600 text-sm">Admin Level</p>
+                      <p class="font-medium capitalize">
+                          {{ $user->admin_level ?? 'Not specified' }}
+                      </p>
+                  </div>
+                  <div>
+                      <p class="text-gray-600 text-sm">Total Users Managed</p>
+                      <p class="font-medium">
+                          {{ \App\Models\User::count() }}
+                      </p>
+                  </div>
+                  <div>
+                      <p class="text-gray-600 text-sm">Total Jobs Managed</p>
+                      <p class="font-medium">
+                          {{ \App\Models\Job::count() }}
+                      </p>
+                  </div>
+                  <div>
+                      <p class="text-gray-600 text-sm">Pending Job Approvals</p>
+                      <p class="font-medium">
+                          {{ \App\Models\Job::where('is_approved', false)->count() }}
+                      </p>
+                  </div>
+              </div>
           </div>
       @endif
   </div>

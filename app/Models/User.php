@@ -21,7 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',  // Changed from 'role'
+        'role',  
+        'admin_level',
       ];
 
     /**
@@ -67,7 +68,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(Job::class, 'employer_id');
     }
-
+// ====================================
+public function getProfileImageUrlAttribute()
+{
+    return $this->profile_image 
+        ? Storage::url($this->profile_image) 
+        : '/default-avatar.png';
+}
     /**
      * Get the applications submitted by the candidate user.
      */

@@ -4,41 +4,73 @@
       <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-8">
           <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Edit User Profile</h2>
           
-          <form action="{{ route('admin.users.update', $user->id) }}" method="POST" class="space-y-6">
-              @csrf
-              @method('PUT')
-              
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                      <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-                      <input 
-                          type="text" 
-                          name="name" 
-                          id="name" 
-                          value="{{ old('name', $user->name) }}" 
-                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                          required
-                      >
-                      @error('name')
-                          <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                      @enderror
-                  </div>
-
-                  <div>
-                      <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                      <input 
-                          type="email" 
-                          name="email" 
-                          id="email" 
-                          value="{{ old('email', $user->email) }}" 
-                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                          required
-                      >
-                      @error('email')
-                          <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                      @enderror
-                  </div>
-              </div>
+          <form action="{{ route('admin.users.update', $user->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+            @csrf
+            @method('PUT')
+            
+            {{-- Profile Picture Upload --}}
+            <div class="flex flex-col items-center mb-6">
+                <div class="mb-4">
+                    <img 
+                        src="{{ $user->profile_image ? Storage::url($user->profile_image) : '/default-avatar.png' }}" 
+                        alt="Profile Picture" 
+                        class="w-32 h-32 rounded-full object-cover"
+                    >
+                </div>
+                <div>
+                    <label for="profile_image" class="block text-sm font-medium text-gray-700">
+                        Update Profile Picture
+                    </label>
+                    <input 
+                        type="file" 
+                        name="profile_image" 
+                        id="profile_image" 
+                        accept="image/*"
+                        class="mt-1 block w-full text-sm text-gray-500 
+                        file:mr-4 file:py-2 file:px-4 
+                        file:rounded-full file:border-0 
+                        file:text-sm file:font-semibold
+                        file:bg-indigo-50 file:text-indigo-700
+                        hover:file:bg-indigo-100"
+                    >
+                    @error('profile_image')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+  
+            {{-- Rest of the existing form remains the same --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                    <input 
+                        type="text" 
+                        name="name" 
+                        id="name" 
+                        value="{{ old('name', $user->name) }}" 
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                        required
+                    >
+                    @error('name')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+  
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        id="email" 
+                        value="{{ old('email', $user->email) }}" 
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                        required
+                    >
+                    @error('email')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
 
               <div>
                   <label for="role" class="block text-sm font-medium text-gray-700">User Role</label>
