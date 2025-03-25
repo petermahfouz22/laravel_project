@@ -42,6 +42,18 @@ Route::get('/register/{role}', function ($role) {
   return view('auth.register', ['role' => $role]);
 })->name('register.form');
 
+Route::middleware('guest')->group(function () {
+  // Public Job Listing
+  Route::get('/jobs', [CandidateJobController::class, 'index'])->name('guest.jobs.index');
+  Route::get('/jobs/search', [CandidateJobController::class, 'search'])->name('guest.jobs.search');
+  
+  // Job Details (already exists in your current routes)
+  // Route::get('/jobs/{job}', [CandidateJobController::class, 'show'])->name('jobs.show');
+
+  // Additional public pages
+  Route::get('/about', [HomeController::class, 'about'])->name('guest.about');
+  Route::get('/contact', [HomeController::class, 'contact'])->name('guest.contact');
+});
 
 
 // Registration Routes
@@ -93,12 +105,12 @@ Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function
 });
 
 
+
+
+// Candidate Routes
 Route::get('/jobs/{job}', [CandidateJobController::class, 'show'])->name('jobs.show');
-Route::get('/jobs', [CandidateJobController::class, 'index'])->name('jobs.index');
-
-
-    // Candidate Routes
-    Route::middleware('role:candidate')->prefix('candidate')->name('candidate.')->group(function () {
+Route::middleware('role:candidate')->prefix('candidate')->name('candidate.')->group(function () {
+  Route::get('/jobs', [CandidateJobController::class, 'index'])->name('jobs.index');
       Route::get('/dashboard', [CandidateDashboardController::class, 'index'])->name('dashboard');
       Route::get('/profile', [CandidateProfileController::class, 'index'])->name('profile.index');
       Route::get('/profile/edit', [CandidateProfileController::class, 'edit'])->name('profile.edit');
@@ -138,5 +150,5 @@ Route::get('/jobs', [CandidateJobController::class, 'index'])->name('jobs.index'
   Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
   // Logout
-  Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+  
 

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Job;
 use App\Models\JobCategory;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\Request;
+use Illuminate\Http\Request; // Change from Symfony\Component\HttpFoundation\Request
 
 class JobController extends Controller
 {
@@ -53,9 +53,10 @@ public function search(Request $request)
         });
     }
     
-    if ($request->has('category_id') && $request->category_id) {
-        $query->where('category_id', $request->category_id);
-    }
+      
+    if ($request->filled('category_id')) {
+      $query->where('category_id', $request->category_id);
+  }
     
     $jobs = $query->with('category')->paginate(10);
     $categories = JobCategory::all();

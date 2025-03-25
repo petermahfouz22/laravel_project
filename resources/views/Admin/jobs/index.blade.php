@@ -3,8 +3,14 @@
         <div class="bg-white shadow rounded-lg">
             <div class="bg-gray-900 text-white px-6 py-4 rounded-t-lg">
                 <h3 class="text-lg font-semibold">Job Listings</h3>
-            </div>
-
+            
+                {{-- <a 
+                href="{{ route('admin.jobs.pending') }}" 
+                class="btn text-white bg-purple-600 hover:bg-blue-700 px-4 py-1 rounded-lg"
+            >
+            pending Jobs
+            </a> --}}
+      </div>
             <!-- Filters -->
             <form action="{{ route('admin.jobs.index') }}" method="GET" class="p-4">
                 <div class="grid md:grid-cols-3 gap-4">
@@ -88,11 +94,11 @@
                                 <td class="px-4 py-2 text-center">{{ $job->category->name }}</td>
                                 <td class="px-4 py-2 text-center">
                                     @if(!$job->is_approved)
-                                        <span class="badge badge-warning">Pending Approval</span>
+                                        <span class="  badge badge-warning">Pending Approval</span>
                                     @elseif(!$job->is_active)
-                                        <span class="badge badge-error">Inactive</span>
+                                        <span class=" badge badge-error">Inactive</span>
                                     @else
-                                        <span class="badge badge-success">Active</span>
+                                        <span class=" badge badge-success">Active</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-2 text-center">
