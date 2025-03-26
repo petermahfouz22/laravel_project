@@ -7,6 +7,8 @@ use App\Http\Controllers\Candidate\JobController as CandidateJobController;
 use App\Http\Controllers\Candidate\MessageController as CandidateMessageController;
 use App\Http\Controllers\Candidate\ProfileController as CandidateProfileController;
 use App\Http\Controllers\Employer\DashboardController as EmployerDashboardController;
+// =================================================================
+use App\Http\Controllers\Candidate\ResumeController as CandidateResumeController;
 use App\Http\Controllers\Employer\EmployerJobController;
 use App\Http\Controllers\Employer\ApplicantController;
 use App\Http\Controllers\Employer\CompanyProfileController;
@@ -118,6 +120,15 @@ Route::middleware('role:candidate')->prefix('candidate')->name('candidate.')->gr
       Route::get('/profile/resumes', [CandidateProfileController::class, 'resumes'])->name('profile.resumes');
       Route::post('/resume', [CandidateProfileController::class, 'storeResume'])->name('resume.store');
       Route::delete('/resume/{resume}', [CandidateProfileController::class, 'deleteResume'])->name('resume.delete');
+    // ============
+  // In the candidate routes group
+Route::get('/resumes', [CandidateResumeController::class, 'index'])->name('profile.resumes');
+Route::get('/resume/create', [CandidateResumeController::class, 'create'])->name('resume.create');
+Route::post('/resume', [CandidateResumeController::class, 'store'])->name('resume.store');
+Route::get('/resume/{resume}/download', [CandidateResumeController::class, 'download'])->name('resume.download');
+Route::put('/resume/{resume}/set-default', [CandidateResumeController::class, 'setDefault'])->name('resume.set-default');
+Route::delete('/resume/{resume}', [CandidateResumeController::class, 'destroy'])->name('resume.delete');
+    // ============
       Route::get('/jobs/search', [CandidateJobController::class, 'search'])->name('jobs.search');
       Route::post('/jobs/{job}/save', [CandidateJobController::class, 'save'])->name('jobs.save');
       Route::get('/applications', [CandidateApplicationController::class, 'index'])->name('applications.index');
