@@ -15,34 +15,38 @@
         </div>
     </header>
 
-    <!-- Job Listings Section -->
-    <main class="bg-gray-50 py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold text-blue-900 mb-8 text-center">Latest Job Opportunities</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach ($jobs as $job)
-                    <div class="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-xl transition duration-300 ease-in-out border-l-4 border-blue-600">
-                        <div class="p-6">
-                            <h3 class="text-xl font-semibold text-blue-900 mb-3">{{ $job->title }}</h3>
-                            <p class="text-gray-600 mb-4 line-clamp-3">{{ $job->description }}</p>
-                            <div class="flex justify-between items-center mt-4">
-                                <span class="text-sm text-gray-500">{{ $job->created_at->diffForHumans() }}</span>
-                                <a href="{{ route('jobs.show', ['job' => $job->id]) }}" class="text-blue-600 hover:text-blue-800 font-medium transition duration-200">
-                                    View Details
-                                </a>
-                            </div>
-                        </div>
+  <!-- Job Listings Section -->
+  <main class="bg-gray-50 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-blue-900 mb-8 text-center">Latest Job Opportunities</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach ($jobs as $job)
+                <div class="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-xl transition duration-300 ease-in-out border-l-4 border-blue-600">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-blue-900 mb-3">{{ $job->title }}</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">{{ $job->description }}</p>
+                        @if($job->is_approved === false)
+                        <div class="text-sm text-gray-500"><a href="{{ route('login') }}">Pending Review</a></div>
+                            @else
+                                <div class="flex justify-between items-center mt-4">
+                                    <span class="text-sm text-gray-500">{{ $job->created_at->diffForHumans() }}</span>
+                                    <a href="{{ route('jobs.show', ['job' => $job->id]) }}" class="text-blue-600 hover:text-blue-800 font-medium transition duration-200">
+                                        View Details
+                                    </a>
+                                </div>
+                            @endif
                     </div>
-                @endforeach
-            </div>
-
-            @if($jobs->isEmpty())
-                <div class="text-center py-12">
-                    <p class="text-xl text-gray-500">No jobs available at the moment</p>
                 </div>
-            @endif
-
+            @endforeach
         </div>
-    </main>
+
+        @if($jobs->isEmpty())
+            <div class="text-center py-12">
+                <p class="text-xl text-gray-500">No jobs available at the moment</p>
+            </div>
+        @endif
+
+    </div>
+  </main>
+
 </x-guest-layout>
