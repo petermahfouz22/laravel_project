@@ -13,8 +13,10 @@
               <div class="bg-gradient-to-r from-blue-700 to-blue-900 p-6">
                   <div class="flex items-center space-x-6">
                       <div class="w-24 h-24 flex-shrink-0">
-                          <img 
-                              src="{{ $user->profile_image ? asset('storage/' . $user->profile_image) : asset('default-avatar.png') }}" 
+                      <img
+                              src="{{ $user->profile_image 
+                                  ? Storage::url($user->profile_image) 
+                                  : asset('images/default-avatar.png') }}" 
                               alt="{{ $user->name }}'s profile picture" 
                               class="w-24 h-24 rounded-full object-cover border-4 border-white/20"
                           >
@@ -114,23 +116,6 @@
                                   </span>
                               </div>
 
-                              @if($user->resumes->count() > 0)
-                                  <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-md">
-                                      <h4 class="text-blue-800 dark:text-blue-200 font-semibold mb-2">Recent Resumes</h4>
-                                      @foreach($user->resumes->take(2) as $resume)
-                                          <div class="flex justify-between items-center mb-2 last:mb-0">
-                                              <span class="text-gray-600 dark:text-gray-300 text-sm">
-                                                  {{ Str::limit(basename($resume->path), 20) }}
-                                              </span>
-                                              <a href="{{ asset('storage/' . $resume->path) }}" 
-                                                 target="_blank" 
-                                                 class="text-blue-600 dark:text-blue-400 hover:text-blue-800 transition duration-200">
-                                                  View
-                                              </a>
-                                          </div>
-                                      @endforeach
-                                  </div>
-                              @endif
                           </div>
                       </div>
                   </div>

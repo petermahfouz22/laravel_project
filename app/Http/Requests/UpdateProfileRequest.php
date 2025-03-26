@@ -13,21 +13,19 @@ class UpdateProfileRequest extends FormRequest
     public function rules()
     {
         return [
-          'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'bio' => 'nullable|string|max:1000',
-            'location' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:15',
-            'profile_image' => 'nullable|image|max:2048',
-            'linkedin_url' => 'nullable|url|max:255',
-            'website' => 'nullable|url|max:255',
+            'phone' => ['nullable', 'string', 'max:20'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'linkedin_url' => ['nullable', 'url', 'max:255'],
+            'website' => ['nullable', 'url', 'max:255'],
+            'bio' => ['nullable', 'string', 'max:1000'],
+            'profile_image' => ['nullable', 'image', 'max:2048'],
         ];
     }
 
     protected function prepareForValidation()
     {
         if ($this->hasFile('profile_image')) {
-            $this->merge(['profile_image' => $this->file('profile_image')->store('profile_images', 'public')]);
-        }
-    }
+            $this->merge(['profile_image' => $this->file('profile_image')->store('profiles', 'public')]);
+}
+}
 }

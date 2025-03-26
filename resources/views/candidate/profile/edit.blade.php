@@ -26,7 +26,7 @@
                               {{-- Basic Information --}}
                               <div class="space-y-4">
                                   <div>
-                                      <x-input-label for="name" :value="__('Full Name')" />
+                                      <x-input-label for="name" :value="('Full Name')" />
                                       <x-text-input id="name" name="name" type="text" 
                                           class="mt-1 block w-full" 
                                           :value="old('name', $user->name)" 
@@ -38,7 +38,7 @@
                                   </div>
 
                                   <div>
-                                      <x-input-label for="email" :value="__('Email Address')" />
+                                      <x-input-label for="email" :value="('Email Address')" />
                                       <x-text-input id="email" name="email" type="email" 
                                           class="mt-1 block w-full" 
                                           :value="old('email', $user->email)" 
@@ -49,10 +49,10 @@
                                   </div>
 
                                   <div>
-                                      <x-input-label for="phone" :value="__('Phone Number')" />
+                                      <x-input-label for="phone" :value="('Phone Number')" />
                                       <x-text-input id="phone" name="phone" type="tel" 
                                           class="mt-1 block w-full" 
-                                          :value="old('phone', $user->phone ?? '')" 
+                                          :value="old('phone', $user->profile->phone ?? '')" 
                                           autocomplete="tel" 
                                       />
                                       <x-input-error class="mt-2" :messages="$errors->get('phone')" />
@@ -62,30 +62,30 @@
                               {{-- Professional Details --}}
                               <div class="space-y-4">
                                   <div>
-                                      <x-input-label for="location" :value="__('Location')" />
+                                      <x-input-label for="location" :value="('Location')" />
                                       <x-text-input id="location" name="location" type="text" 
                                           class="mt-1 block w-full" 
-                                          :value="old('location', $user->location ?? '')" 
+                                          :value="old('location', $user->profile->location ?? '')" 
                                           autocomplete="address-level2" 
                                       />
                                       <x-input-error class="mt-2" :messages="$errors->get('location')" />
                                   </div>
 
                                   <div>
-                                      <x-input-label for="linkedin_url" :value="__('LinkedIn Profile')" />
+                                      <x-input-label for="linkedin_url" :value="('LinkedIn Profile')" />
                                       <x-text-input id="linkedin_url" name="linkedin_url" type="url" 
                                           class="mt-1 block w-full" 
-                                          :value="old('linkedin_url', $user->linkedin_url ?? '')" 
+                                          :value="old('linkedin_url', $user->profile->linkedin_url ?? '')" 
                                           placeholder="https://www.linkedin.com/in/yourprofile" 
                                       />
                                       <x-input-error class="mt-2" :messages="$errors->get('linkedin_url')" />
                                   </div>
 
                                   <div>
-                                      <x-input-label for="website" :value="__('Personal Website')" />
+                                      <x-input-label for="website" :value="('Personal Website')" />
                                       <x-text-input id="website" name="website" type="url" 
                                           class="mt-1 block w-full" 
-                                          :value="old('website', $user->website ?? '')" 
+                                          :value="old('website', $user->profile->website ?? '')" 
                                           placeholder="https://www.yourportfolio.com" 
                                       />
                                       <x-input-error class="mt-2" :messages="$errors->get('website')" />
@@ -95,12 +95,12 @@
 
                           {{-- Bio Section --}}
                           <div class="mt-6">
-                              <x-input-label for="bio" :value="__('Professional Bio')" />
+                              <x-input-label for="bio" :value="('Professional Bio')" />
                               <textarea id="bio" name="bio" 
                                   class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" 
                                   rows="4" 
                                   placeholder="{{ __('Tell us about your professional journey, skills, and aspirations.') }}"
-                              >{{ old('bio', $user->bio ?? '') }}</textarea>
+                              >{{ old('bio', $user->profile->bio ?? '') }}</textarea>
                               <x-input-error class="mt-2" :messages="$errors->get('bio')" />
                           </div>
 

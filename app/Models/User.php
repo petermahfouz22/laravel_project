@@ -48,24 +48,11 @@ class User extends Authenticatable
     /**
      * Get the profile associated with the user.
      */
-  
-
     public function profile()
     {
-        return $this->hasOne(Profile::class)->withDefault([
-            'profile_image' => null,
-            'phone' => null,
-            'location' => null,
-            'linkedin_url' => null,
-            'website' => null,
-            'bio' => null,
-        ]);
+        return $this->hasOne(Profile::class);
     }
-    
-    public function candidate()
-    {
-        return $this->hasOne(Candidate::class);
-    }
+
     /**
      * Get the company associated with the employer user.
      */
@@ -82,11 +69,11 @@ class User extends Authenticatable
         return $this->hasMany(Job::class, 'employer_id');
     }
 // ====================================
-
-
-public function getProfileImageAttribute()
+public function getProfileImageUrlAttribute()
 {
-    return $this->profile ? $this->profile->profile_image : null;
+    return $this->profile_image 
+        ? Storage::url($this->profile_image) 
+        : '/default-avatar.png';
 }
     /**
      * Get the applications submitted by the candidate user.
@@ -137,8 +124,8 @@ public function getProfileImageAttribute()
     }
 
   /**
- * Check if user has the specified role.
- */
+ * Check if user has the specified role.
+ */
 
 
 
