@@ -2,11 +2,13 @@
 namespace App\Http\Controllers\Candidate;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ProfileUpdateRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\StoreResumeRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Resume;
+use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
@@ -15,7 +17,7 @@ class ProfileController extends Controller
         $user = auth()->user();
         return view('candidate.profile.index', compact('user'));
     }
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(UpdateProfileRequest $request): RedirectResponse
     {
         $user = auth()->user();
         $validatedData = $request->validated();
@@ -24,24 +26,29 @@ class ProfileController extends Controller
         $user->update([
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
+            'phone' => $validatedData['phone'],
+            'location' => $validatedData['location'] ,
+            'linkedin_url' => $validatedData['linkedin_url'] ,
+            'website' => $validatedData['website'] ,
+            'bio' => $validatedData['bio'] ,
         ]);
     
-        // Ensure user has a profile, create one if not exists
-        $profile = $user->profile ?? $user->profile()->create();
+        // // Ensure user has a profile, create one if not exists
+        // $profile = $user->profile ?? $user->profile()->create();
     
-        // Update profile-specific fields
-        $profile->update([
-            'phone' => $validatedData['phone'] ?? null,
-            'location' => $validatedData['location'] ?? null,
-            'linkedin_url' => $validatedData['linkedin_url'] ?? null,
-            'website' => $validatedData['website'] ?? null,
-            'bio' => $validatedData['bio'] ?? null,
-        ]);
+        // // Update profile-specific fields
+        // $profile->update([
+        //     'phone' => $validatedData['phone'] ?? null,
+        //     'location' => $validatedData['location'] ?? null,
+        //     'linkedin_url' => $validatedData['linkedin_url'] ?? null,
+        //     'website' => $validatedData['website'] ?? null,
+        //     'bio' => $validatedData['bio'] ?? null,
+        // ]);
     
         // Handle profile image upload
         if ($request->hasFile('profile_image')) {
             $imagePath = $request->file('profile_image')->store('profile_images', 'public');
-            $profile->update(['profile_image' => $imagePath]);
+            $user->update(['profile_image' => $imagePath]);
         }
     
         return redirect()->route('candidate.profile.index')->with('status', 'Profile updated successfully!');

@@ -14,7 +14,7 @@
                   <div class="flex items-center space-x-6">
                       <div class="w-24 h-24 flex-shrink-0">
                           <img 
-                              src="{{ $user->profile->profile_image ? Storage::url($user->profile->profile_image) : '/default-avatar.png' }}" 
+                              src="{{ $user->profile_image ? asset('storage/' . $user->profile_image) : asset('default-avatar.png') }}" 
                               alt="{{ $user->name }}'s profile picture" 
                               class="w-24 h-24 rounded-full object-cover border-4 border-white/20"
                           >
@@ -113,7 +113,7 @@
                                       {{ $user->resumes->count() }} uploaded
                                   </span>
                               </div>
-{{-- 
+
                               @if($user->resumes->count() > 0)
                                   <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-md">
                                       <h4 class="text-blue-800 dark:text-blue-200 font-semibold mb-2">Recent Resumes</h4>
@@ -130,7 +130,7 @@
                                           </div>
                                       @endforeach
                                   </div>
-                              @endif --}}
+                              @endif
                           </div>
                       </div>
                   </div>

@@ -52,7 +52,7 @@
                                       <x-input-label for="phone" :value="__('Phone Number')" />
                                       <x-text-input id="phone" name="phone" type="tel" 
                                           class="mt-1 block w-full" 
-                                          :value="old('phone', $user->profile->phone ?? '')" 
+                                          :value="old('phone', $user->phone ?? '')" 
                                           autocomplete="tel" 
                                       />
                                       <x-input-error class="mt-2" :messages="$errors->get('phone')" />
@@ -65,7 +65,7 @@
                                       <x-input-label for="location" :value="__('Location')" />
                                       <x-text-input id="location" name="location" type="text" 
                                           class="mt-1 block w-full" 
-                                          :value="old('location', $user->profile->location ?? '')" 
+                                          :value="old('location', $user->location ?? '')" 
                                           autocomplete="address-level2" 
                                       />
                                       <x-input-error class="mt-2" :messages="$errors->get('location')" />
@@ -75,7 +75,7 @@
                                       <x-input-label for="linkedin_url" :value="__('LinkedIn Profile')" />
                                       <x-text-input id="linkedin_url" name="linkedin_url" type="url" 
                                           class="mt-1 block w-full" 
-                                          :value="old('linkedin_url', $user->profile->linkedin_url ?? '')" 
+                                          :value="old('linkedin_url', $user->linkedin_url ?? '')" 
                                           placeholder="https://www.linkedin.com/in/yourprofile" 
                                       />
                                       <x-input-error class="mt-2" :messages="$errors->get('linkedin_url')" />
@@ -85,7 +85,7 @@
                                       <x-input-label for="website" :value="__('Personal Website')" />
                                       <x-text-input id="website" name="website" type="url" 
                                           class="mt-1 block w-full" 
-                                          :value="old('website', $user->profile->website ?? '')" 
+                                          :value="old('website', $user->website ?? '')" 
                                           placeholder="https://www.yourportfolio.com" 
                                       />
                                       <x-input-error class="mt-2" :messages="$errors->get('website')" />
@@ -100,27 +100,40 @@
                                   class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" 
                                   rows="4" 
                                   placeholder="{{ __('Tell us about your professional journey, skills, and aspirations.') }}"
-                              >{{ old('bio', $user->profile->bio ?? '') }}</textarea>
+                              >{{ old('bio', $user->bio ?? '') }}</textarea>
                               <x-input-error class="mt-2" :messages="$errors->get('bio')" />
                           </div>
 
-                          {{-- Profile Image Upload --}}
-                          <div class="mt-6">
-                              <x-input-label for="profile_image" :value="__('Profile Picture')" />
-                              <input id="profile_image" name="profile_image" type="file" 
-                                  class="mt-1 block w-full text-sm text-gray-500 
-                                  file:mr-4 file:py-2 file:px-4 
-                                  file:rounded-full file:border-0 
-                                  file:text-sm file:font-semibold 
-                                  file:bg-blue-50 file:text-blue-700 
-                                  hover:file:bg-blue-100" 
-                                  accept="image/*" 
-                              />
-                              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                  {{ __('PNG, JPG, or WEBP (max 5MB)') }}
-                              </p>
-                              <x-input-error class="mt-2" :messages="$errors->get('profile_image')" />
-                          </div>
+                        {{-- Profile Picture Upload --}}
+            <div class="flex flex-col items-center mb-6">
+                <div class="mb-4">
+                    <img 
+                        src="{{ $user->profile_image ? Storage::url($user->profile_image) : '/default-avatar.png' }}" 
+                        alt="Profile Picture" 
+                        class="w-32 h-32 rounded-full object-cover"
+                    >
+                </div>
+                <div>
+                    <label for="profile_image" class="block text-sm font-medium text-gray-700">
+                        Update Profile Picture
+                    </label>
+                    <input 
+                        type="file" 
+                        name="profile_image" 
+                        id="profile_image" 
+                        accept="image/*"
+                        class="mt-1 block w-full text-sm text-gray-500 
+                        file:mr-4 file:py-2 file:px-4 
+                        file:rounded-full file:border-0 
+                        file:text-sm file:font-semibold
+                        file:bg-indigo-50 file:text-indigo-700
+                        hover:file:bg-indigo-100"
+                    >
+                    @error('profile_image')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
 
                           <div class="flex items-center gap-4 mt-6">
                               <x-primary-button>{{ __('Save Profile') }}</x-primary-button>
